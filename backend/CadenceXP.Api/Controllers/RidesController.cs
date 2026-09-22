@@ -18,22 +18,57 @@ public class RidesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<Ride>>> GetRides()
+    public async Task<ActionResult<List<RideResponse>>> GetRides()
     {
-        var rides = await _database.Rides.ToListAsync();
+        var rides = await _database.Rides
+            .Select(ride => new RideResponse
+            {
+                Id = ride.Id,
+                Name = ride.Name,
+                UserId = ride.UserId,
+                UserDisplayName = ride.User.DisplayName,
+                BikeId = ride.BikeId,
+                BikeName = ride.Bike.Name,
+                DistanceMeters = ride.DistanceMeters,
+                ElevationGainMeters = ride.ElevationGainMeters,
+                DurationSeconds = ride.DurationSeconds,
+                RideDateUtc = ride.RideDateUtc
+            })
+            .ToListAsync();
 
         return Ok(rides);
     }
 
     [HttpPost]
-    public async Task<ActionResult<Ride>> CreateRide(
-        CreateRideRequest request)
+    public async Task<ActionResult<Ride>> CreateRide(CreateRideRequest request)
     {
+        var userExists = await _database.Users.AnyAsync(user => user.Id == request.UserId);
+
+        if (!userExists)
+        {
+            return BadRequest("User does not exist.");
+        }
+
+        var bikeBelongsToUser = await _database.Bikes
+            .AnyAsync(bike =>
+                bike.Id == request.BikeId &&
+                bike.UserId == request.UserId
+            );
+
+        if (!bikeBelongsToUser)
+        {
+            return BadRequest("Bike does not belong to this user.");
+        }
+
         var ride = new Ride
         {
             Name = request.Name,
-            DistanceMiles = request.DistanceMiles,
-            RideDate = request.RideDate
+            UserId = request.UserId,
+            BikeId = request.BikeId,
+            DistanceMeters = request.DistanceMeters,
+            ElevationGainMeters = request.ElevationGainMeters,
+            DurationSeconds = request.DurationSeconds,
+            RideDateUtc = request.RideDateUtc
         };
 
         _database.Rides.Add(ride);

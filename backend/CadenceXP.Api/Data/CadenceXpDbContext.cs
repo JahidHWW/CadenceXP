@@ -10,5 +10,8 @@ public class CadenceXpDbContext : DbContext
     {
     }
 
-    public DbSet<Ride> Rides { get; set; }
+    public DbSet<AppUser> Users {get; set;} = null!;
+    public DbSet<Bike> Bikes {get; set;} = null!;
+    public DbSet<Ride> Rides { get; set;} = null!;
+
 }

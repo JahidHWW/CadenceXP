@@ -25,6 +25,39 @@ public class BikesController : ControllerBase
         return Ok(bikes);
     }
 
+    [HttpGet("{id}/rides")]
+    public async Task<ActionResult<List<RideResponse>>> GetBikeRides(int id)
+    {
+        var bikeExists = await _database.Bikes
+            .AnyAsync(bike => bike.Id == id);
+
+        if (!bikeExists)
+        {
+            return NotFound();
+        }
+
+        var rides = await _database.Rides
+            .Where(ride => ride.BikeId == id)
+            .Select(ride => new RideResponse
+            {
+                Id = ride.Id,
+                Name = ride.Name,
+                UserId = ride.UserId,
+                UserDisplayName = ride.User.DisplayName,
+                BikeId = ride.BikeId,
+                BikeName = ride.Bike.Name,
+                DistanceMeters = ride.DistanceMeters,
+                ElevationGainMeters = ride.ElevationGainMeters,
+                DurationSeconds = ride.DurationSeconds,
+                RideDateUtc = ride.RideDateUtc,
+                OriginalFileName = ride.OriginalFileName,
+                ProcessingStatus = ride.ProcessingStatus
+            })
+            .ToListAsync();
+
+        return Ok(rides);
+    }
+
     [HttpPost]
     public async Task<ActionResult<Bike>> CreateBike(
         CreateBikeRequest request)

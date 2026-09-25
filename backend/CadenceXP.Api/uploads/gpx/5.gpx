@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="CadenceXP">
+  <trk>
+    <name>Test Ride</name>
+    <trkseg>
+      <trkpt lat="42.6526" lon="-73.7562">
+        <ele>20</ele>
+        <time>2026-09-25T18:00:00Z</time>
+      </trkpt>
+      <trkpt lat="42.6530" lon="-73.7550">
+        <ele>25</ele>
+        <time>2026-09-25T18:01:00Z</time>
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

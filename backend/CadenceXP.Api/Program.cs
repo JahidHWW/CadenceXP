@@ -1,10 +1,19 @@
 using CadenceXP.Api.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
+using CadenceXP.Api.Services.Gpx;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
-
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(
+            new JsonStringEnumConverter()
+        );
+    });
+    
 var connectionString =
     builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException(
@@ -15,6 +24,8 @@ builder.Services.AddDbContext<CadenceXpDbContext>(options =>
 {
     options.UseNpgsql(connectionString);
 });
+
+builder.Services.AddScoped<GpxParser>();
 
 builder.Services.AddCors(options =>
 {

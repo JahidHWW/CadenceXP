@@ -1,4 +1,5 @@
 namespace CadenceXP.Api.Dtos;
+using CadenceXP.Api.Models.Enums;
 
 public class RideResponse
 {
@@ -21,4 +22,8 @@ public class RideResponse
     public int DurationSeconds { get; set; }
 
     public DateTime RideDateUtc { get; set; }
+
+    public string? OriginalFileName { get; set; }
+
+    public RideProcessingStatus ProcessingStatus { get; set; }
 }

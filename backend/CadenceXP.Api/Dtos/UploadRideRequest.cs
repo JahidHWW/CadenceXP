@@ -1,8 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace CadenceXP.Api.Dtos;
 
-public class CreateRideRequest
+public class UploadRideRequest
 {
     [Required]
     [StringLength(100, MinimumLength = 2)]
@@ -14,14 +15,6 @@ public class CreateRideRequest
     [Range(1, int.MaxValue)]
     public int BikeId { get; set; }
 
-    [Range(1, double.MaxValue)]
-    public double DistanceMeters { get; set; }
-
-    [Range(0, double.MaxValue)]
-    public double ElevationGainMeters { get; set; }
-
-    [Range(1, int.MaxValue)]
-    public int DurationSeconds { get; set; }
-
-    public DateTime RideDateUtc { get; set; }
+    [Required]
+    public required IFormFile File { get; set; }
 }

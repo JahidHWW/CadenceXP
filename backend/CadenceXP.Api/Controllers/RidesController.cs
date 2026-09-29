@@ -1,10 +1,11 @@
 using CadenceXP.Api.Data;
-using CadenceXP.Api.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using CadenceXP.Api.Dtos;
+using CadenceXP.Api.Models;
 using CadenceXP.Api.Models.Enums;
 using CadenceXP.Api.Services.Gpx;
+using CadenceXP.Api.Services.Rides;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CadenceXP.Api.Controllers;
 
@@ -15,15 +16,18 @@ public class RidesController : ControllerBase
     private readonly CadenceXpDbContext _database;
     private readonly IWebHostEnvironment _environment;
     private readonly GpxParser _gpxParser;
+    private readonly RideProcessingService _rideProcessingService;
 
     public RidesController(
         CadenceXpDbContext database,
         IWebHostEnvironment environment,
-        GpxParser gpxParser)
+        GpxParser gpxParser,
+        RideProcessingService rideProcessingService)
     {
         _database = database;
         _environment = environment;
         _gpxParser = gpxParser;
+        _rideProcessingService = rideProcessingService;
     }
 
     [HttpGet]
@@ -50,8 +54,38 @@ public class RidesController : ControllerBase
         return Ok(rides);
     }
 
+    [HttpGet("{id}")]
+    public async Task<ActionResult<RideResponse>> GetRideById(int id)
+    {
+        var ride = await _database.Rides
+            .Where(ride => ride.Id == id)
+            .Select(ride => new RideResponse
+            {
+                Id = ride.Id,
+                Name = ride.Name,
+                UserId = ride.UserId,
+                UserDisplayName = ride.User.DisplayName,
+                BikeId = ride.BikeId,
+                BikeName = ride.Bike.Name,
+                DistanceMeters = ride.DistanceMeters,
+                ElevationGainMeters = ride.ElevationGainMeters,
+                DurationSeconds = ride.DurationSeconds,
+                RideDateUtc = ride.RideDateUtc,
+                OriginalFileName = ride.OriginalFileName,
+                ProcessingStatus = ride.ProcessingStatus
+            })
+            .FirstOrDefaultAsync();
+
+        if (ride is null)
+        {
+            return NotFound("Ride does not exist.");
+        }
+
+        return Ok(ride);
+    }
+
     [HttpPost("upload")]
-    public async Task<ActionResult<Ride>> UploadRide(
+    public async Task<ActionResult<RideResponse>> UploadRide(
         [FromForm] UploadRideRequest request)
     {
         var userExists = await _database.Users
@@ -75,7 +109,9 @@ public class RidesController : ControllerBase
 
         var extension = Path.GetExtension(request.File.FileName);
 
-        if (!extension.Equals(".gpx", StringComparison.OrdinalIgnoreCase))
+        if (!extension.Equals(
+            ".gpx",
+            StringComparison.OrdinalIgnoreCase))
         {
             return BadRequest("Only GPX files are supported.");
         }
@@ -97,9 +133,11 @@ public class RidesController : ControllerBase
 
             RideDateUtc = DateTime.UtcNow,
 
-            OriginalFileName = Path.GetFileName(request.File.FileName),
+            OriginalFileName =
+                Path.GetFileName(request.File.FileName),
 
-            ProcessingStatus = RideProcessingStatus.Pending
+            ProcessingStatus =
+                RideProcessingStatus.Pending
         };
 
         _database.Rides.Add(ride);
@@ -118,18 +156,93 @@ public class RidesController : ControllerBase
             $"{ride.Id}.gpx"
         );
 
-        await using var fileStream = new FileStream(
-            filePath,
-            FileMode.Create
+        // Save the uploaded GPX.
+        // The stream is closed when this block ends.
+        {
+            await using var fileStream = new FileStream(
+                filePath,
+                FileMode.Create
+            );
+
+            await request.File.CopyToAsync(fileStream);
+        }
+
+        try
+        {
+            ride.ProcessingStatus =
+                RideProcessingStatus.Processing;
+
+            await _database.SaveChangesAsync();
+
+            var result =
+                _rideProcessingService.Process(filePath);
+
+            ride.DistanceMeters =
+                result.DistanceMeters;
+
+            ride.ElevationGainMeters =
+                result.ElevationGainMeters;
+
+            ride.DurationSeconds =
+                result.DurationSeconds;
+
+            ride.RideDateUtc =
+                result.RideDateUtc;
+
+            ride.ProcessingStatus =
+                RideProcessingStatus.Completed;
+
+            await _database.SaveChangesAsync();
+        }
+        catch (InvalidOperationException)
+        {
+            ride.ProcessingStatus =
+                RideProcessingStatus.Failed;
+
+            await _database.SaveChangesAsync();
+        }
+        catch
+        {
+            ride.ProcessingStatus =
+                RideProcessingStatus.Failed;
+
+            await _database.SaveChangesAsync();
+        }
+
+        var response = new RideResponse
+        {
+            Id = ride.Id,
+            Name = ride.Name,
+
+            UserId = ride.UserId,
+            UserDisplayName = await _database.Users
+                .Where(user => user.Id == ride.UserId)
+                .Select(user => user.DisplayName)
+                .FirstAsync(),
+
+            BikeId = ride.BikeId,
+            BikeName = await _database.Bikes
+                .Where(bike => bike.Id == ride.BikeId)
+                .Select(bike => bike.Name)
+                .FirstAsync(),
+
+            DistanceMeters = ride.DistanceMeters,
+            ElevationGainMeters = ride.ElevationGainMeters,
+            DurationSeconds = ride.DurationSeconds,
+            RideDateUtc = ride.RideDateUtc,
+            OriginalFileName = ride.OriginalFileName,
+            ProcessingStatus = ride.ProcessingStatus
+        };
+
+        return Created(
+            $"/api/rides/{ride.Id}",
+            response
         );
-
-        await request.File.CopyToAsync(fileStream);
-
-        return Created($"/api/rides/{ride.Id}", ride);
     }
 
     [HttpGet("{id}/track-points")]
-    public async Task<ActionResult<List<GpxTrackPoint>>> GetTrackPoints(int id)
+    public async Task<ActionResult<List<GpxTrackPoint>>> GetTrackPoints(
+        int id)
     {
         var ride = await _database.Rides.FindAsync(id);
 
@@ -147,7 +260,9 @@ public class RidesController : ControllerBase
 
         if (!System.IO.File.Exists(filePath))
         {
-            return NotFound("GPX file does not exist for this ride.");
+            return NotFound(
+                "GPX file does not exist for this ride."
+            );
         }
 
         var trackPoints = _gpxParser.Parse(filePath);
@@ -177,38 +292,35 @@ public class RidesController : ControllerBase
 
         if (!System.IO.File.Exists(filePath))
         {
-            return NotFound("GPX file does not exist for this ride.");
+            return NotFound(
+                "GPX file does not exist for this ride."
+            );
         }
 
         try
         {
-            ride.ProcessingStatus = RideProcessingStatus.Processing;
+            ride.ProcessingStatus =
+                RideProcessingStatus.Processing;
+
             await _database.SaveChangesAsync();
 
-            var trackPoints = _gpxParser.Parse(filePath);
-
-            if (trackPoints.Count < 2)
-            {
-                ride.ProcessingStatus = RideProcessingStatus.Failed;
-                await _database.SaveChangesAsync();
-
-                return BadRequest(
-                    "The GPX file does not contain enough track points."
-                );
-            }
+            var result =
+                _rideProcessingService.Process(filePath);
 
             ride.DistanceMeters =
-                _gpxParser.CalculateDistanceMeters(trackPoints);
+                result.DistanceMeters;
 
             ride.ElevationGainMeters =
-                _gpxParser.CalculateElevationGainMeters(trackPoints);
+                result.ElevationGainMeters;
 
             ride.DurationSeconds =
-                _gpxParser.CalculateDurationSeconds(trackPoints);
+                result.DurationSeconds;
 
-            ride.RideDateUtc = trackPoints[0].TimeUtc;
+            ride.RideDateUtc =
+                result.RideDateUtc;
 
-            ride.ProcessingStatus = RideProcessingStatus.Completed;
+            ride.ProcessingStatus =
+                RideProcessingStatus.Completed;
 
             await _database.SaveChangesAsync();
 
@@ -224,7 +336,9 @@ public class RidesController : ControllerBase
                 BikeName = ride.Bike.Name,
 
                 DistanceMeters = ride.DistanceMeters,
-                ElevationGainMeters = ride.ElevationGainMeters,
+                ElevationGainMeters =
+                    ride.ElevationGainMeters,
+
                 DurationSeconds = ride.DurationSeconds,
                 RideDateUtc = ride.RideDateUtc,
 
@@ -234,9 +348,20 @@ public class RidesController : ControllerBase
 
             return Ok(response);
         }
+        catch (InvalidOperationException exception)
+        {
+            ride.ProcessingStatus =
+                RideProcessingStatus.Failed;
+
+            await _database.SaveChangesAsync();
+
+            return BadRequest(exception.Message);
+        }
         catch
         {
-            ride.ProcessingStatus = RideProcessingStatus.Failed;
+            ride.ProcessingStatus =
+                RideProcessingStatus.Failed;
+
             await _database.SaveChangesAsync();
 
             return StatusCode(

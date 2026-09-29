@@ -2,6 +2,7 @@ using CadenceXP.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using CadenceXP.Api.Services.Gpx;
+using CadenceXP.Api.Services.Rides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,7 @@ builder.Services.AddDbContext<CadenceXpDbContext>(options =>
 });
 
 builder.Services.AddScoped<GpxParser>();
+builder.Services.AddScoped<RideProcessingService>();
 
 builder.Services.AddCors(options =>
 {

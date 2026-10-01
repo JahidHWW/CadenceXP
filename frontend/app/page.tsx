@@ -1,72 +1,157 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-type HealthResponse = {
-  status: string;
-  application: string;
-};
+import { getRides } from "@/lib/api";
+import type { Ride } from "@/types/ride";
+import {
+  metersToMiles,
+  metersToFeet,
+  formatDuration
+} from "@/lib/formatters";
 
 export default function Home() {
-  const [health, setHealth] = useState<HealthResponse | null>(null);
+  const [rides, setRides] = useState<Ride[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function checkBackend() {
+    async function loadRides() {
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/health`
-        );
-
-        if (!response.ok) {
-          throw new Error("Backend request failed");
-        }
-
-        const data: HealthResponse = await response.json();
-
-        setHealth(data);
+        const rideData = await getRides();
+        setRides(rideData);
       } catch {
-        setError("Unable to connect to the CadenceXP backend.");
+        setError("Unable to load rides.");
+      } finally {
+        setLoading(false);
       }
     }
 
-    checkBackend();
+    loadRides();
   }, []);
+
+  const completedRides = rides.filter(
+    (ride) => ride.processingStatus === "Completed"
+  );
+
+  const totalDistanceMiles = completedRides.reduce(
+    (total, ride) =>
+      total + metersToMiles(ride.distanceMeters),
+    0
+  );
+
+  const totalElevationFeet = completedRides.reduce(
+    (total, ride) =>
+      total + metersToFeet(ride.elevationGainMeters),
+    0
+  );
 
   return (
     <main className="min-h-screen bg-zinc-950 text-white">
-      <div className="mx-auto max-w-5xl px-6 py-20">
-        <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-lime-400">
+      <div className="mx-auto max-w-5xl px-6 py-16">
+        <p className="text-sm font-semibold uppercase tracking-widest text-lime-400">
           CadenceXP
         </p>
 
-        <h1 className="max-w-3xl text-5xl font-bold tracking-tight">
-          Turn every ride into progress.
+        <h1 className="mt-4 text-4xl font-bold">
+          Ride Dashboard
         </h1>
 
-        <p className="mt-6 max-w-2xl text-lg text-zinc-400">
-          Track your cycling, complete quests, earn XP, unlock achievements,
-          and watch your progress grow with every ride.
-        </p>
+        {error && (
+          <p className="mt-6 text-red-400">
+            {error}
+          </p>
+        )}
 
-        <div className="mt-10 rounded-xl border border-zinc-800 bg-zinc-900 p-6">
-          <h2 className="text-xl font-semibold">System Status</h2>
-
-          {!health && !error && (
-            <p className="mt-2 text-zinc-400">Checking backend...</p>
-          )}
-
-          {health && (
-            <p className="mt-2 text-lime-400">
-              {health.application} backend is {health.status}.
+        <div className="mt-10 grid gap-4 sm:grid-cols-3">
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+            <p className="text-sm text-zinc-500">
+              Completed Rides
             </p>
-          )}
 
-          {error && (
-            <p className="mt-2 text-red-400">
-              {error}
+            <p className="mt-2 text-2xl font-bold">
+              {completedRides.length}
             </p>
-          )}
+          </div>
+
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+            <p className="text-sm text-zinc-500">
+              Total Distance
+            </p>
+
+            <p className="mt-2 text-2xl font-bold">
+              {totalDistanceMiles.toFixed(1)} mi
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+            <p className="text-sm text-zinc-500">
+              Total Elevation
+            </p>
+
+            <p className="mt-2 text-2xl font-bold">
+              {Math.round(totalElevationFeet)} ft
+            </p>
+          </div>
+        </div>
+
+        {loading && (
+          <p className="mt-6 text-zinc-400">
+            Loading rides...
+          </p>
+        )}
+
+        <div className="mt-10 space-y-4">
+          {rides.map((ride) => (
+            <div
+              key={ride.id}
+              className="rounded-xl border border-zinc-800 bg-zinc-900 p-5"
+            >
+              <h2 className="text-xl font-semibold">
+                {ride.name}
+              </h2>
+
+              <p className="mt-2 text-zinc-400">
+                Bike: {ride.bikeName}
+              </p>
+
+              <div className="mt-4 grid grid-cols-3 gap-4">
+                <div>
+                  <p className="text-sm text-zinc-500">
+                    Distance
+                  </p>
+
+                  <p className="font-semibold">
+                    {metersToMiles(ride.distanceMeters).toFixed(1)} mi
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-zinc-500">
+                    Elevation
+                  </p>
+
+                  <p className="font-semibold">
+                    {Math.round(
+                      metersToFeet(ride.elevationGainMeters)
+                    )} ft
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-zinc-500">
+                    Duration
+                  </p>
+
+                  <p className="font-semibold">
+                    {formatDuration(ride.durationSeconds)}
+                  </p>
+                </div>
+              </div>
+              <span className="mt-4 inline-block rounded-full border border-zinc-700 px-3 py-1 text-sm text-zinc-300">
+                {ride.processingStatus}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </main>

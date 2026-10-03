@@ -8,6 +8,7 @@ import {
   metersToFeet,
   formatDuration
 } from "@/lib/formatters";
+import Link from "next/link";
 
 export default function Home() {
   const [rides, setRides] = useState<Ride[]>([]);
@@ -102,55 +103,60 @@ export default function Home() {
 
         <div className="mt-10 space-y-4">
           {rides.map((ride) => (
-            <div
+            <Link
               key={ride.id}
-              className="rounded-xl border border-zinc-800 bg-zinc-900 p-5"
+              href={`/rides/${ride.id}`}
+              className="block"
             >
-              <h2 className="text-xl font-semibold">
-                {ride.name}
-              </h2>
+              <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+                <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+                  <h2 className="text-xl font-semibold">
+                    {ride.name}
+                  </h2>
 
-              <p className="mt-2 text-zinc-400">
-                Bike: {ride.bikeName}
-              </p>
-
-              <div className="mt-4 grid grid-cols-3 gap-4">
-                <div>
-                  <p className="text-sm text-zinc-500">
-                    Distance
+                  <p className="mt-2 text-zinc-400">
+                    Bike: {ride.bikeName}
                   </p>
 
-                  <p className="font-semibold">
-                    {metersToMiles(ride.distanceMeters).toFixed(1)} mi
-                  </p>
-                </div>
+                  <div className="mt-4 grid grid-cols-3 gap-4">
+                    <div>
+                      <p className="text-sm text-zinc-500">
+                        Distance
+                      </p>
 
-                <div>
-                  <p className="text-sm text-zinc-500">
-                    Elevation
-                  </p>
+                      <p className="font-semibold">
+                        {metersToMiles(ride.distanceMeters).toFixed(1)} mi
+                      </p>
+                    </div>
 
-                  <p className="font-semibold">
-                    {Math.round(
-                      metersToFeet(ride.elevationGainMeters)
-                    )} ft
-                  </p>
-                </div>
+                    <div>
+                      <p className="text-sm text-zinc-500">
+                        Elevation
+                      </p>
 
-                <div>
-                  <p className="text-sm text-zinc-500">
-                    Duration
-                  </p>
+                      <p className="font-semibold">
+                        {Math.round(
+                          metersToFeet(ride.elevationGainMeters)
+                        )} ft
+                      </p>
+                    </div>
 
-                  <p className="font-semibold">
-                    {formatDuration(ride.durationSeconds)}
-                  </p>
+                    <div>
+                      <p className="text-sm text-zinc-500">
+                        Duration
+                      </p>
+
+                      <p className="font-semibold">
+                        {formatDuration(ride.durationSeconds)}
+                      </p>
+                    </div>
+                  </div>
+                  <span className="mt-4 inline-block rounded-full border border-zinc-700 px-3 py-1 text-sm text-zinc-300">
+                    {ride.processingStatus}
+                  </span>
                 </div>
               </div>
-              <span className="mt-4 inline-block rounded-full border border-zinc-700 px-3 py-1 text-sm text-zinc-300">
-                {ride.processingStatus}
-              </span>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

@@ -1,10 +1,16 @@
-import { getRideById } from "@/lib/api";
+import {
+    getRideById,
+    getRideTrackPoints
+} from "@/lib/api";
+import type { TrackPoint } from "@/types/trackPoint";
+//import RideMap from "@/components/RideMapClient";
 
 import {
     metersToMiles,
     metersToFeet,
     formatDuration
 } from "@/lib/formatters";
+import RideMapClient from "@/components/RideMapClient";
 
 type RideDetailsPageProps = {
     params: Promise<{
@@ -18,6 +24,12 @@ export default async function RideDetailsPage({
     const { id } = await params;
 
     const ride = await getRideById(Number(id));
+    let trackPoints: TrackPoint[] = [];
+    try {
+        trackPoints = await getRideTrackPoints(Number(id));
+    } catch {
+        trackPoints = [];
+    }
 
     return (
         <main className="min-h-screen bg-zinc-950 text-white">
@@ -81,6 +93,14 @@ export default async function RideDetailsPage({
                 <span className="mt-6 inline-block rounded-full border border-zinc-700 px-3 py-1 text-sm text-zinc-300">
                     {ride.processingStatus}
                 </span>
+
+                <div className="mt-8">
+                    <h2 className="mb-4 text-2xl font-bold">
+                        Route
+                    </h2>
+
+                    <RideMapClient trackPoints={trackPoints} />
+                </div>
             </div>
         </main>
     );

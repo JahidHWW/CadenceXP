@@ -1,34 +1,15 @@
-"use client";
+import Link from "next/link";
 
-import { useEffect, useState } from "react";
 import { getRides } from "@/lib/api";
-import type { Ride } from "@/types/ride";
+
 import {
   metersToMiles,
   metersToFeet,
   formatDuration
 } from "@/lib/formatters";
-import Link from "next/link";
 
-export default function Home() {
-  const [rides, setRides] = useState<Ride[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function loadRides() {
-      try {
-        const rideData = await getRides();
-        setRides(rideData);
-      } catch {
-        setError("Unable to load rides.");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadRides();
-  }, []);
+export default async function Home() {
+  const rides = await getRides();
 
   const completedRides = rides.filter(
     (ride) => ride.processingStatus === "Completed"
@@ -56,12 +37,6 @@ export default function Home() {
         <h1 className="mt-4 text-4xl font-bold">
           Ride Dashboard
         </h1>
-
-        {error && (
-          <p className="mt-6 text-red-400">
-            {error}
-          </p>
-        )}
 
         <div className="mt-10 grid gap-4 sm:grid-cols-3">
           <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
@@ -95,12 +70,6 @@ export default function Home() {
           </div>
         </div>
 
-        {loading && (
-          <p className="mt-6 text-zinc-400">
-            Loading rides...
-          </p>
-        )}
-
         <div className="mt-10 space-y-4">
           {rides.map((ride) => (
             <Link
@@ -109,52 +78,57 @@ export default function Home() {
               className="block"
             >
               <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
-                <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
-                  <h2 className="text-xl font-semibold">
-                    {ride.name}
-                  </h2>
+                <h2 className="text-xl font-semibold">
+                  {ride.name}
+                </h2>
 
-                  <p className="mt-2 text-zinc-400">
-                    Bike: {ride.bikeName}
-                  </p>
+                <p className="mt-2 text-zinc-400">
+                  Bike: {ride.bikeName}
+                </p>
 
-                  <div className="mt-4 grid grid-cols-3 gap-4">
-                    <div>
-                      <p className="text-sm text-zinc-500">
-                        Distance
-                      </p>
+                <div className="mt-4 grid grid-cols-3 gap-4">
+                  <div>
+                    <p className="text-sm text-zinc-500">
+                      Distance
+                    </p>
 
-                      <p className="font-semibold">
-                        {metersToMiles(ride.distanceMeters).toFixed(1)} mi
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-sm text-zinc-500">
-                        Elevation
-                      </p>
-
-                      <p className="font-semibold">
-                        {Math.round(
-                          metersToFeet(ride.elevationGainMeters)
-                        )} ft
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-sm text-zinc-500">
-                        Duration
-                      </p>
-
-                      <p className="font-semibold">
-                        {formatDuration(ride.durationSeconds)}
-                      </p>
-                    </div>
+                    <p className="font-semibold">
+                      {metersToMiles(
+                        ride.distanceMeters
+                      ).toFixed(1)} mi
+                    </p>
                   </div>
-                  <span className="mt-4 inline-block rounded-full border border-zinc-700 px-3 py-1 text-sm text-zinc-300">
-                    {ride.processingStatus}
-                  </span>
+
+                  <div>
+                    <p className="text-sm text-zinc-500">
+                      Elevation
+                    </p>
+
+                    <p className="font-semibold">
+                      {Math.round(
+                        metersToFeet(
+                          ride.elevationGainMeters
+                        )
+                      )} ft
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-zinc-500">
+                      Duration
+                    </p>
+
+                    <p className="font-semibold">
+                      {formatDuration(
+                        ride.durationSeconds
+                      )}
+                    </p>
+                  </div>
                 </div>
+
+                <span className="mt-4 inline-block rounded-full border border-zinc-700 px-3 py-1 text-sm text-zinc-300">
+                  {ride.processingStatus}
+                </span>
               </div>
             </Link>
           ))}

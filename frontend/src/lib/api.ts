@@ -45,3 +45,26 @@ export async function getRideTrackPoints(
 
     return trackPoints;
 }
+
+export async function uploadRide(
+    formData: FormData
+): Promise<Ride> {
+    const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/rides/upload`,
+        {
+            method: "POST",
+            body: formData
+        }
+    );
+
+    if (!response.ok) {
+        const message = await response.text();
+
+        throw new Error(
+            message || "Failed to upload ride."
+        );
+    }
+
+    const ride: Ride = await response.json();
+    return ride;
+}

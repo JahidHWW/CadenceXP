@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { uploadRide } from "@/lib/api";
+import { getUserBikes, uploadRide } from "@/lib/api";
+import type { Bike } from "@/types/bike";
 
 export default function UploadRidePage() {
     const [name, setName] = useState("");
@@ -10,6 +11,25 @@ export default function UploadRidePage() {
     const router = useRouter();
     const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [bikes, setBikes] = useState<Bike[]>([]);
+    const [selectedBikeId, setSelectedBikeId] = useState("");
+    const [isLoadingBikes, setIsLoadingBikes] = useState(true);
+
+    useEffect(() => {
+        async function loadBikes() {
+            try {
+                const bikes = await getUserBikes(1);
+
+                setBikes(bikes);
+            } catch (error) {
+                console.error("Failed to load bikes.", error);
+            } finally {
+                setIsLoadingBikes(false);
+            }
+        }
+
+        loadBikes();
+    }, []);
 
     async function handleSubmit(
         event: React.FormEvent<HTMLFormElement>
@@ -18,6 +38,11 @@ export default function UploadRidePage() {
 
         if (name.trim().length < 2) {
             setError("Ride name must be at least 2 characters.");
+            return;
+        }
+
+        if (!selectedBikeId) {
+            setError("Please select a bike.");
             return;
         }
 
@@ -44,7 +69,7 @@ export default function UploadRidePage() {
 
             formData.append("Name", name);
             formData.append("UserId", "1");
-            formData.append("BikeId", "1");
+            formData.append("BikeId", selectedBikeId);
             formData.append("File", file);
 
             const ride = await uploadRide(formData);
@@ -88,6 +113,38 @@ export default function UploadRidePage() {
                             }
                             className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3"
                         />
+                    </div>
+
+                    <div>
+                        <label className="mb-2 block text-sm text-zinc-400">
+                            Bike
+                        </label>
+
+                        <select
+                            value={selectedBikeId}
+                            onChange={(event) =>
+                                setSelectedBikeId(event.target.value)
+                            }
+                            className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3"
+                            disabled={isLoadingBikes || bikes.length === 0}
+                        >
+                            <option value="">
+                                {isLoadingBikes
+                                    ? "Loading bikes..."
+                                    : bikes.length === 0
+                                        ? "No bikes available"
+                                        : "Select a bike"}
+                            </option>
+
+                            {bikes.map((bike) => (
+                                <option
+                                    key={bike.id}
+                                    value={bike.id}
+                                >
+                                    {bike.name} — {bike.type}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     <div>

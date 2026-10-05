@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using CadenceXP.Api.Data;
 using CadenceXP.Api.Dtos;
 using CadenceXP.Api.Models;
@@ -31,7 +32,7 @@ public class UsersController : ControllerBase
         var user = await _database.Users
             .FirstOrDefaultAsync(user => user.Id == id);
 
-        if(user is null)
+        if (user is null)
         {
             return NotFound();
         }
@@ -53,5 +54,15 @@ public class UsersController : ControllerBase
         await _database.SaveChangesAsync();
 
         return Created($"/api/users/{user.Id}", user);
+    }
+
+    [HttpGet("{id}/bikes")]
+    public async Task<ActionResult<List<Bike>>> GetBikesByUserId(int id)
+    {
+        var bikes = await _database.Bikes
+        .Where(bike => bike.UserId == id)
+        .ToListAsync();
+
+        return Ok(bikes);
     }
 }

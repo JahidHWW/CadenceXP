@@ -38,12 +38,21 @@ export default async function Home() {
           Ride Dashboard
         </h1>
 
-        <Link
-          href="/upload"
-          className="inline-block rounded-lg bg-lime-400 px-5 py-3 font-semibold text-black transition hover:bg-lime-300"
-        >
-          Upload Ride
-        </Link>
+        <div className="mt-6 flex gap-3">
+          <Link
+            href="/upload"
+            className="rounded-lg bg-lime-400 px-5 py-3 font-semibold text-black transition hover:bg-lime-300"
+          >
+            Upload Ride
+          </Link>
+
+          <Link
+            href="/bikes"
+            className="rounded-lg border border-zinc-700 px-5 py-3 font-semibold text-white transition hover:bg-zinc-800"
+          >
+            My Bikes
+          </Link>
+        </div>
 
         <div className="mt-10 grid gap-4 sm:grid-cols-3">
           <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">

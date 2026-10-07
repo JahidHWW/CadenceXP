@@ -1,6 +1,6 @@
 import type { Ride } from "@/types/ride";
 import type { TrackPoint } from "@/types/trackPoint";
-import type { Bike } from "@/types/bike";
+import type { Bike, CreateBikeRequest } from "@/types/bike";
 
 export async function getRides(): Promise<Ride[]> {
     const response = await fetch(
@@ -89,4 +89,31 @@ export async function getUserBikes(
     const bikes: Bike[] = await response.json();
 
     return bikes;
+}
+
+export async function createBike(
+    request: CreateBikeRequest
+): Promise<Bike> {
+    const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/bikes`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(request)
+        }
+    );
+
+    if (!response.ok) {
+        const message = await response.text();
+
+        throw new Error(
+            message || "Failed to create bike."
+        );
+    }
+
+    const bike: Bike = await response.json();
+
+    return bike;
 }

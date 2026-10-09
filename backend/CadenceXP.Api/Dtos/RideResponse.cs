@@ -1,4 +1,5 @@
 namespace CadenceXP.Api.Dtos;
+
 using CadenceXP.Api.Models.Enums;
 
 public class RideResponse
@@ -20,6 +21,8 @@ public class RideResponse
     public double ElevationGainMeters { get; set; }
 
     public int DurationSeconds { get; set; }
+
+    public int XpEarned { get; set; }
 
     public DateTime RideDateUtc { get; set; }
 

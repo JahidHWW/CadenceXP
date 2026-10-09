@@ -46,7 +46,7 @@ export default async function RideDetailsPage({
                     Bike: {ride.bikeName}
                 </p>
 
-                <div className="mt-10 grid gap-4 sm:grid-cols-3">
+                <div className="mt-10 grid gap-4 sm:grid-cols-4">
                     <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
                         <p className="text-sm text-zinc-500">
                             Distance
@@ -76,6 +76,16 @@ export default async function RideDetailsPage({
 
                         <p className="mt-2 text-2xl font-bold">
                             {formatDuration(ride.durationSeconds)}
+                        </p>
+                    </div>
+
+                    <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+                        <p className="text-sm text-zinc-500">
+                            XP Earned
+                        </p>
+
+                        <p className="mt-2 text-2xl font-bold text-lime-400">
+                            +{ride.xpEarned} XP
                         </p>
                     </div>
                 </div>

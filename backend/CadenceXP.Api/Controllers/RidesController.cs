@@ -6,6 +6,7 @@ using CadenceXP.Api.Services.Gpx;
 using CadenceXP.Api.Services.Rides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using CadenceXP.Api.Services.Xp;
 
 namespace CadenceXP.Api.Controllers;
 
@@ -17,17 +18,20 @@ public class RidesController : ControllerBase
     private readonly IWebHostEnvironment _environment;
     private readonly GpxParser _gpxParser;
     private readonly RideProcessingService _rideProcessingService;
+    private readonly XpService _xpService;
 
     public RidesController(
         CadenceXpDbContext database,
         IWebHostEnvironment environment,
         GpxParser gpxParser,
-        RideProcessingService rideProcessingService)
+        RideProcessingService rideProcessingService,
+        XpService xpService)
     {
         _database = database;
         _environment = environment;
         _gpxParser = gpxParser;
         _rideProcessingService = rideProcessingService;
+        _xpService = xpService;
     }
 
     [HttpGet]
@@ -46,6 +50,7 @@ public class RidesController : ControllerBase
                 ElevationGainMeters = ride.ElevationGainMeters,
                 DurationSeconds = ride.DurationSeconds,
                 RideDateUtc = ride.RideDateUtc,
+                XpEarned = ride.XpEarned,
                 OriginalFileName = ride.OriginalFileName,
                 ProcessingStatus = ride.ProcessingStatus
             })
@@ -71,6 +76,7 @@ public class RidesController : ControllerBase
                 ElevationGainMeters = ride.ElevationGainMeters,
                 DurationSeconds = ride.DurationSeconds,
                 RideDateUtc = ride.RideDateUtc,
+                XpEarned = ride.XpEarned,
                 OriginalFileName = ride.OriginalFileName,
                 ProcessingStatus = ride.ProcessingStatus
             })
@@ -192,6 +198,11 @@ public class RidesController : ControllerBase
             ride.ProcessingStatus =
                 RideProcessingStatus.Completed;
 
+            ride.XpEarned = _xpService.CalculateRideXp(
+                ride.DistanceMeters,
+                ride.ElevationGainMeters
+            );
+
             await _database.SaveChangesAsync();
         }
         catch (InvalidOperationException)
@@ -230,6 +241,7 @@ public class RidesController : ControllerBase
             ElevationGainMeters = ride.ElevationGainMeters,
             DurationSeconds = ride.DurationSeconds,
             RideDateUtc = ride.RideDateUtc,
+            XpEarned = ride.XpEarned,
             OriginalFileName = ride.OriginalFileName,
             ProcessingStatus = ride.ProcessingStatus
         };
@@ -322,6 +334,11 @@ public class RidesController : ControllerBase
             ride.ProcessingStatus =
                 RideProcessingStatus.Completed;
 
+            ride.XpEarned = _xpService.CalculateRideXp(
+                ride.DistanceMeters,
+                ride.ElevationGainMeters
+            );
+
             await _database.SaveChangesAsync();
 
             var response = new RideResponse
@@ -341,6 +358,8 @@ public class RidesController : ControllerBase
 
                 DurationSeconds = ride.DurationSeconds,
                 RideDateUtc = ride.RideDateUtc,
+
+                XpEarned = ride.XpEarned,
 
                 OriginalFileName = ride.OriginalFileName,
                 ProcessingStatus = ride.ProcessingStatus

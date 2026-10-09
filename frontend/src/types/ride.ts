@@ -14,6 +14,8 @@ export type Ride = {
 
     rideDateUtc: string;
 
+    xpEarned: number;
+
     originalFileName: string | null;
 
     processingStatus:

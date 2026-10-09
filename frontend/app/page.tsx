@@ -54,7 +54,7 @@ export default async function Home() {
           </Link>
         </div>
 
-        <div className="mt-10 grid gap-4 sm:grid-cols-3">
+        <div className="mt-10 grid gap-4 sm:grid-cols-4">
           <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
             <p className="text-sm text-zinc-500">
               Completed Rides
@@ -138,6 +138,16 @@ export default async function Home() {
                       {formatDuration(
                         ride.durationSeconds
                       )}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-zinc-500">
+                      XP
+                    </p>
+
+                    <p className="font-semibold text-lime-400">
+                      +{ride.xpEarned}
                     </p>
                   </div>
                 </div>

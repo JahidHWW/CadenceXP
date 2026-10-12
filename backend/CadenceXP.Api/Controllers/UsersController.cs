@@ -1,9 +1,9 @@
-using System.Collections.Concurrent;
 using CadenceXP.Api.Data;
 using CadenceXP.Api.Dtos;
 using CadenceXP.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using CadenceXP.Api.Services.Xp;
 
 namespace CadenceXP.Api.Controllers;
 
@@ -12,10 +12,12 @@ namespace CadenceXP.Api.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly CadenceXpDbContext _database;
+    private readonly XpService _xpService;
 
-    public UsersController(CadenceXpDbContext database)
+    public UsersController(CadenceXpDbContext database, XpService xpService)
     {
         _database = database;
+        _xpService = xpService;
     }
 
     [HttpGet]
@@ -64,5 +66,34 @@ public class UsersController : ControllerBase
         .ToListAsync();
 
         return Ok(bikes);
+    }
+
+    [HttpGet("{id}/progress")]
+    public async Task<ActionResult<UserProgressResponse>> GetUserProgress(
+        int id
+    )
+    {
+        var userExists = await _database.Users
+        .AnyAsync(user => user.Id == id);
+
+        if (!userExists)
+        {
+            return NotFound();
+        }
+
+        int totalXp = await _database.Rides
+        .Where(ride => ride.UserId == id)
+        .SumAsync(ride => ride.XpEarned);
+
+        var level = _xpService.CalculateLevel(totalXp);
+
+        var response = new UserProgressResponse
+        {
+            UserId = id,
+            TotalXp = totalXp,
+            Level = level
+        };
+
+        return Ok(response);
     }
 }

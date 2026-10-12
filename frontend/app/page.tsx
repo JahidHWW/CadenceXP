@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { getRides } from "@/lib/api";
+import { getRides, getUserProgress } from "@/lib/api";
 
 import {
   metersToMiles,
@@ -8,8 +8,11 @@ import {
   formatDuration
 } from "@/lib/formatters";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
-  const rides = await getRides();
+  const [rides, progress] = await Promise.all([
+    getRides(), getUserProgress(1)]);
 
   const completedRides = rides.filter(
     (ride) => ride.processingStatus === "Completed"
@@ -54,7 +57,27 @@ export default async function Home() {
           </Link>
         </div>
 
-        <div className="mt-10 grid gap-4 sm:grid-cols-4">
+        <div className="mt-10 grid gap-4 sm:grid-cols-5">
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+            <p className="text-sm text-zinc-500">
+              Level
+            </p>
+
+            <p className="mt-2 text-2xl font-bold text-lime-400">
+              {progress.level}
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+            <p className="text-sm text-zinc-500">
+              Total XP
+            </p>
+
+            <p className="mt-2 text-2xl font-bold">
+              {progress.totalXp}
+            </p>
+          </div>
+
           <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
             <p className="text-sm text-zinc-500">
               Completed Rides

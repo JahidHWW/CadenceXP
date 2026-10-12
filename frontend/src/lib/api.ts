@@ -1,6 +1,7 @@
 import type { Ride } from "@/types/ride";
 import type { TrackPoint } from "@/types/trackPoint";
 import type { Bike, CreateBikeRequest } from "@/types/bike";
+import type { UserProgress } from "@/types/userProgress";
 
 export async function getRides(): Promise<Ride[]> {
     const response = await fetch(
@@ -116,4 +117,21 @@ export async function createBike(
     const bike: Bike = await response.json();
 
     return bike;
+}
+
+export async function getUserProgress(
+    userId: number
+): Promise<UserProgress> {
+    const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/${userId}/progress`
+    );
+
+    if (!response.ok) {
+        throw new Error("Failed to fetch user progress.");
+    }
+
+    const progress: UserProgress =
+        await response.json();
+
+    return progress;
 }

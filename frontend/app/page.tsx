@@ -14,6 +14,19 @@ export default async function Home() {
   const [rides, progress] = await Promise.all([
     getRides(), getUserProgress(1)]);
 
+  const progressPercent =
+    progress.xpForNextLevel > 0
+      ? Math.min(
+        100,
+        Math.max(
+          0,
+          (progress.xpIntoLevel /
+            progress.xpForNextLevel) *
+          100
+        )
+      )
+      : 100;
+
   const completedRides = rides.filter(
     (ride) => ride.processingStatus === "Completed"
   );
@@ -57,7 +70,7 @@ export default async function Home() {
           </Link>
         </div>
 
-        <div className="mt-10 grid gap-4 sm:grid-cols-5">
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
             <p className="text-sm text-zinc-500">
               Level
@@ -109,6 +122,27 @@ export default async function Home() {
           </div>
         </div>
 
+        <div className="mt-6 rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+          <div className="flex items-center justify-between">
+            <p className="font-semibold">
+              Level {progress.level}
+            </p>
+
+            <p className="text-sm text-zinc-400">
+              {progress.xpIntoLevel} / {progress.xpForNextLevel} XP
+            </p>
+          </div>
+
+          <div className="mt-3 h-3 w-full overflow-hidden rounded-full bg-zinc-800">
+            <div
+              className="h-full rounded-full bg-lime-400"
+              style={{
+                width: `${progressPercent}%`
+              }}
+            />
+          </div>
+        </div>
+
         <div className="mt-10 space-y-4">
           {rides.map((ride) => (
             <Link
@@ -125,7 +159,7 @@ export default async function Home() {
                   Bike: {ride.bikeName}
                 </p>
 
-                <div className="mt-4 grid grid-cols-3 gap-4">
+                <div className="mt-4 grid grid-cols-4 gap-4">
                   <div>
                     <p className="text-sm text-zinc-500">
                       Distance

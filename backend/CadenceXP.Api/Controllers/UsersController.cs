@@ -86,12 +86,18 @@ public class UsersController : ControllerBase
         .SumAsync(ride => ride.XpEarned);
 
         var level = _xpService.CalculateLevel(totalXp);
+        var xpIntoLevel =
+            _xpService.CalculateXpIntoLevel(totalXp);
+        var xpForNextLevel =
+            _xpService.CalculateXpForNextLevel(level);
 
         var response = new UserProgressResponse
         {
             UserId = id,
             TotalXp = totalXp,
-            Level = level
+            Level = level,
+            XpIntoLevel = xpIntoLevel,
+            XpForNextLevel = xpForNextLevel
         };
 
         return Ok(response);

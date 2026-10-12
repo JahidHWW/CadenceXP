@@ -34,4 +34,31 @@ public class XpService
         }
         return level;
     }
+
+    public int CalculateXpIntoLevel(int totalXp)
+    {
+        int level = 1;
+        int xpRemaining = totalXp;
+
+        while (level < 50)
+        {
+            int xpRequired = 100 + ((level - 1) * 50);
+            if (xpRemaining < xpRequired)
+            {
+                return xpRemaining;
+            }
+            xpRemaining -= xpRequired;
+            level++;
+        }
+        return xpRemaining;
+    }
+
+    public int CalculateXpForNextLevel(int level)
+    {
+        if (level >= 50)
+        {
+            return 0;
+        }
+        return 100 + ((level - 1) * 50);
+    }
 }

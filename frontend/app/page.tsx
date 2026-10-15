@@ -68,6 +68,15 @@ export default async function Home() {
           >
             My Bikes
           </Link>
+
+          <div className="flex justify-center">
+            <Link
+              href="/quests"
+              className="rounded-lg bg-lime-400 px-5 py-3 font-semibold text-black transition hover:bg-lime-300"
+            >
+              Quests
+            </Link>
+          </div>
         </div>
 
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">

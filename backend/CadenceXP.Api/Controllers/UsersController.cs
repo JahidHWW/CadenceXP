@@ -4,6 +4,7 @@ using CadenceXP.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CadenceXP.Api.Services.Xp;
+using CadenceXP.Api.Models.Enums;
 
 namespace CadenceXP.Api.Controllers;
 
@@ -81,9 +82,18 @@ public class UsersController : ControllerBase
             return NotFound();
         }
 
-        int totalXp = await _database.Rides
-        .Where(ride => ride.UserId == id)
-        .SumAsync(ride => ride.XpEarned);
+        int rideXp = await _database.Rides
+            .Where(ride =>
+                ride.UserId == id &&
+                ride.ProcessingStatus == RideProcessingStatus.Completed)
+            .SumAsync(ride => ride.XpEarned);
+
+        int questXp = await _database.UserQuests
+            .Where(userQuest => userQuest.UserId == id &&
+                userQuest.IsCompleted)
+            .SumAsync(userQuest => userQuest.Quest.XpReward);
+
+        int totalXp = rideXp + questXp;
 
         var level = _xpService.CalculateLevel(totalXp);
         var xpIntoLevel =
@@ -101,5 +111,52 @@ public class UsersController : ControllerBase
         };
 
         return Ok(response);
+    }
+
+    [HttpGet("{id}/quests")]
+    public async Task<ActionResult<List<UserQuestResponse>>> GetUserQuests(int id)
+    {
+        var userExists = await _database.Users
+            .AnyAsync(user => user.Id == id);
+
+        if (!userExists)
+        {
+            return NotFound();
+        }
+
+        var quests = await (
+            from quest in _database.Quests
+
+            join userQuest in _database.UserQuests
+                .Where(userQuest => userQuest.UserId == id)
+
+            on quest.Id equals userQuest.QuestId
+            into userQuestGroup
+            from userQuest in userQuestGroup.DefaultIfEmpty()
+
+            select new UserQuestResponse
+            {
+                QuestId = quest.Id,
+                Name = quest.Name,
+                Description = quest.Description,
+                Type = quest.Type,
+                TargetValue = quest.TargetValue,
+                XpReward = quest.XpReward,
+
+                Progress = userQuest != null
+                ? userQuest.Progress
+                : 0,
+
+                IsCompleted = userQuest != null
+                ? userQuest.IsCompleted
+                : false,
+
+                CompletedAtUtc = userQuest != null
+                ? userQuest.CompletedAtUtc
+                : null
+            }
+        )
+        .ToListAsync();
+        return Ok(quests);
     }
 }

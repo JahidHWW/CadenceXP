@@ -69,6 +69,65 @@ namespace CadenceXP.Api.Migrations
                     b.ToTable("Bikes");
                 });
 
+            modelBuilder.Entity("CadenceXP.Api.Models.Quest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<double>("TargetValue")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("XpReward")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Quests");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Ride a total of 5 miles.",
+                            Name = "Ride 5 Miles",
+                            TargetValue = 5.0,
+                            Type = 0,
+                            XpReward = 75
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Climb a total of 300 meters.",
+                            Name = "Climb 300 Meters",
+                            TargetValue = 300.0,
+                            Type = 1,
+                            XpReward = 100
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Complete your first 3 rides.",
+                            Name = "Complete 3 Rides",
+                            TargetValue = 3.0,
+                            Type = 2,
+                            XpReward = 125
+                        });
+                });
+
             modelBuilder.Entity("CadenceXP.Api.Models.Ride", b =>
                 {
                     b.Property<int>("Id")
@@ -117,6 +176,39 @@ namespace CadenceXP.Api.Migrations
                     b.ToTable("Rides");
                 });
 
+            modelBuilder.Entity("CadenceXP.Api.Models.UserQuest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("CompletedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<double>("Progress")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("QuestId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestId");
+
+                    b.HasIndex("UserId", "QuestId")
+                        .IsUnique();
+
+                    b.ToTable("UserQuests");
+                });
+
             modelBuilder.Entity("CadenceXP.Api.Models.Bike", b =>
                 {
                     b.HasOne("CadenceXP.Api.Models.AppUser", "User")
@@ -143,6 +235,25 @@ namespace CadenceXP.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Bike");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CadenceXP.Api.Models.UserQuest", b =>
+                {
+                    b.HasOne("CadenceXP.Api.Models.Quest", "Quest")
+                        .WithMany()
+                        .HasForeignKey("QuestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CadenceXP.Api.Models.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Quest");
 
                     b.Navigation("User");
                 });

@@ -7,6 +7,7 @@ using CadenceXP.Api.Services.Rides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CadenceXP.Api.Services.Xp;
+using CadenceXP.Api.Services.Quests;
 
 namespace CadenceXP.Api.Controllers;
 
@@ -19,19 +20,22 @@ public class RidesController : ControllerBase
     private readonly GpxParser _gpxParser;
     private readonly RideProcessingService _rideProcessingService;
     private readonly XpService _xpService;
+    private readonly QuestProgressService _questProgressService;
 
     public RidesController(
         CadenceXpDbContext database,
         IWebHostEnvironment environment,
         GpxParser gpxParser,
         RideProcessingService rideProcessingService,
-        XpService xpService)
+        XpService xpService,
+        QuestProgressService questProgressService)
     {
         _database = database;
         _environment = environment;
         _gpxParser = gpxParser;
         _rideProcessingService = rideProcessingService;
         _xpService = xpService;
+        _questProgressService = questProgressService;
     }
 
     [HttpGet]
@@ -204,6 +208,7 @@ public class RidesController : ControllerBase
             );
 
             await _database.SaveChangesAsync();
+            await _questProgressService.UpdateUserQuestProgressAsync(ride.UserId);
         }
         catch (InvalidOperationException)
         {
@@ -340,6 +345,7 @@ public class RidesController : ControllerBase
             );
 
             await _database.SaveChangesAsync();
+            await _questProgressService.UpdateUserQuestProgressAsync(ride.UserId);
 
             var response = new RideResponse
             {

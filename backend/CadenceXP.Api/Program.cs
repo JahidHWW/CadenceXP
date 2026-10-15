@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using CadenceXP.Api.Services.Gpx;
 using CadenceXP.Api.Services.Rides;
 using CadenceXP.Api.Services.Xp;
+using CadenceXP.Api.Services.Quests;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +31,7 @@ builder.Services.AddDbContext<CadenceXpDbContext>(options =>
 builder.Services.AddScoped<GpxParser>();
 builder.Services.AddScoped<RideProcessingService>();
 builder.Services.AddScoped<XpService>();
+builder.Services.AddScoped<QuestProgressService>();
 
 builder.Services.AddCors(options =>
 {

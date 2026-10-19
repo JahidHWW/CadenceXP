@@ -21,6 +21,7 @@ public class RidesController : ControllerBase
     private readonly RideProcessingService _rideProcessingService;
     private readonly XpService _xpService;
     private readonly QuestProgressService _questProgressService;
+    private readonly QuestUnlockService _questUnlockService;
 
     public RidesController(
         CadenceXpDbContext database,
@@ -28,7 +29,8 @@ public class RidesController : ControllerBase
         GpxParser gpxParser,
         RideProcessingService rideProcessingService,
         XpService xpService,
-        QuestProgressService questProgressService)
+        QuestProgressService questProgressService,
+        QuestUnlockService questUnlockService)
     {
         _database = database;
         _environment = environment;
@@ -36,6 +38,7 @@ public class RidesController : ControllerBase
         _rideProcessingService = rideProcessingService;
         _xpService = xpService;
         _questProgressService = questProgressService;
+        _questUnlockService = questUnlockService;
     }
 
     [HttpGet]
@@ -209,6 +212,7 @@ public class RidesController : ControllerBase
 
             await _database.SaveChangesAsync();
             await _questProgressService.UpdateUserQuestProgressAsync(ride.UserId);
+            await _questUnlockService.UnlockEligibleQuestsAsync(ride.UserId);
         }
         catch (InvalidOperationException)
         {
@@ -346,6 +350,7 @@ public class RidesController : ControllerBase
 
             await _database.SaveChangesAsync();
             await _questProgressService.UpdateUserQuestProgressAsync(ride.UserId);
+            await _questUnlockService.UnlockEligibleQuestsAsync(ride.UserId);
 
             var response = new RideResponse
             {

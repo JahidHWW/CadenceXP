@@ -15,44 +15,39 @@ public class QuestProgressService
 
     public async Task UpdateUserQuestProgressAsync(int userId)
     {
-        double totalDistanceMeters = await _database.Rides
-            .Where(ride =>
+        var completedRides = await _database.Rides
+        .Where(ride =>
             ride.UserId == userId &&
             ride.ProcessingStatus == RideProcessingStatus.Completed)
-            .SumAsync(ride => ride.DistanceMeters);
-
-        double totalElevationMeters = await _database.Rides
-            .Where(ride => ride.UserId == userId &&
-            ride.ProcessingStatus == RideProcessingStatus.Completed)
-            .SumAsync(ride => ride.ElevationGainMeters);
-
-        int rideCount = await _database.Rides
-            .Where(ride => ride.UserId == userId &&
-            ride.ProcessingStatus == RideProcessingStatus.Completed)
-            .CountAsync();
-
-        double totalDistanceMiles = totalDistanceMeters / 1609.344;
-
-        var quests = await _database.Quests
-            .ToListAsync();
+        .ToListAsync();
 
         var userQuests = await _database.UserQuests
             .Where(userQuest => userQuest.UserId == userId)
+            .Include(userQuest => userQuest.Quest)
             .ToListAsync();
 
-        foreach (var quest in quests)
+        foreach (var userQuest in userQuests)
         {
-            var userQuest = userQuests
-                .FirstOrDefault(userQuest => userQuest.QuestId == quest.Id);
+            var quest = userQuest.Quest;
+            var ridesSinceUnlock = completedRides
+                .Where(ride => ride.RideDateUtc >= userQuest.UnlockedAtUtc)
+                .ToList();
+
+            double distanceMeters = ridesSinceUnlock
+                .Sum(ride => ride.DistanceMeters);
+            double elevationMeters = ridesSinceUnlock
+                .Sum(ride => ride.ElevationGainMeters);
+            int rideCount = ridesSinceUnlock.Count;
+            double distanceMiles = distanceMeters / 1609.344;
             double progressValue;
             switch (quest.Type)
             {
                 case QuestType.Distance:
-                    progressValue = totalDistanceMiles;
+                    progressValue = distanceMiles;
                     break;
 
                 case QuestType.Elevation:
-                    progressValue = totalElevationMeters;
+                    progressValue = elevationMeters;
                     break;
 
                 case QuestType.RideCount:
@@ -61,18 +56,6 @@ public class QuestProgressService
 
                 default:
                     continue;
-            }
-            if (userQuest == null)
-            {
-                userQuest = new UserQuest
-                {
-                    UserId = userId,
-                    QuestId = quest.Id,
-                    Progress = 0,
-                    IsCompleted = false,
-                    CompletedAtUtc = null
-                };
-                _database.UserQuests.Add(userQuest);
             }
             userQuest.Progress = Math.Min(
                 progressValue,

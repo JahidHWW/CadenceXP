@@ -32,6 +32,7 @@ builder.Services.AddScoped<GpxParser>();
 builder.Services.AddScoped<RideProcessingService>();
 builder.Services.AddScoped<XpService>();
 builder.Services.AddScoped<QuestProgressService>();
+builder.Services.AddScoped<QuestUnlockService>();
 
 builder.Services.AddCors(options =>
 {

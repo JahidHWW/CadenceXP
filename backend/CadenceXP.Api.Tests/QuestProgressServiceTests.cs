@@ -35,6 +35,8 @@ public class QuestProgressServiceTests
         var (user, bike) =
             await CreateTestUserAndBikeAsync(database);
 
+        await CreateUnlockedQuestAsync(database, user, 1);
+
         await CreateTestRideAsync(
             database,
             user,
@@ -71,6 +73,8 @@ public class QuestProgressServiceTests
         var (user, bike) =
             await CreateTestUserAndBikeAsync(database);
 
+        await CreateUnlockedQuestAsync(database, user, 1);
+
         await CreateTestRideAsync(
             database,
             user,
@@ -106,6 +110,8 @@ public class QuestProgressServiceTests
 
         var (user, bike) =
             await CreateTestUserAndBikeAsync(database);
+
+        await CreateUnlockedQuestAsync(database, user, 1);
 
         await CreateTestRideAsync(
             database,
@@ -152,6 +158,8 @@ public class QuestProgressServiceTests
         var (user, bike) =
             await CreateTestUserAndBikeAsync(database);
 
+        await CreateUnlockedQuestAsync(database, user, 1);
+
         await CreateTestRideAsync(
             database,
             user,
@@ -188,6 +196,8 @@ public class QuestProgressServiceTests
 
         var (user, bike) =
             await CreateTestUserAndBikeAsync(database);
+
+        await CreateUnlockedQuestAsync(database, user, 3);
 
         await CreateTestRideAsync(
             database,
@@ -244,6 +254,8 @@ public class QuestProgressServiceTests
         var (user, bike) =
             await CreateTestUserAndBikeAsync(database);
 
+        await CreateUnlockedQuestAsync(database, user, 2);
+
         await CreateTestRideAsync(
             database,
             user,
@@ -280,6 +292,8 @@ public class QuestProgressServiceTests
 
         var (userOne, bikeOne) =
             await CreateTestUserAndBikeAsync(database);
+
+        await CreateUnlockedQuestAsync(database, userOne, 1);
 
         var userTwo = new AppUser
         {
@@ -391,5 +405,26 @@ public class QuestProgressServiceTests
         await database.SaveChangesAsync();
 
         return ride;
+    }
+
+    private static async Task<UserQuest> CreateUnlockedQuestAsync(
+    CadenceXpDbContext database,
+    AppUser user,
+    int questId)
+    {
+        var userQuest = new UserQuest
+        {
+            UserId = user.Id,
+            QuestId = questId,
+            Progress = 0,
+            IsCompleted = false,
+            UnlockedAtUtc = DateTime.UtcNow.AddMinutes(-1),
+            CompletedAtUtc = null
+        };
+
+        database.UserQuests.Add(userQuest);
+        await database.SaveChangesAsync();
+
+        return userQuest;
     }
 }

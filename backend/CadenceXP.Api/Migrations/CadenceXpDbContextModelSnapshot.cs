@@ -81,9 +81,15 @@ namespace CadenceXP.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("Difficulty")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("RequiredLevel")
+                        .HasColumnType("integer");
 
                     b.Property<double>("TargetValue")
                         .HasColumnType("double precision");
@@ -103,7 +109,9 @@ namespace CadenceXP.Api.Migrations
                         {
                             Id = 1,
                             Description = "Ride a total of 5 miles.",
+                            Difficulty = 0,
                             Name = "Ride 5 Miles",
+                            RequiredLevel = 1,
                             TargetValue = 5.0,
                             Type = 0,
                             XpReward = 75
@@ -112,7 +120,9 @@ namespace CadenceXP.Api.Migrations
                         {
                             Id = 2,
                             Description = "Climb a total of 300 meters.",
+                            Difficulty = 0,
                             Name = "Climb 300 Meters",
+                            RequiredLevel = 1,
                             TargetValue = 300.0,
                             Type = 1,
                             XpReward = 100
@@ -121,7 +131,9 @@ namespace CadenceXP.Api.Migrations
                         {
                             Id = 3,
                             Description = "Complete your first 3 rides.",
+                            Difficulty = 0,
                             Name = "Complete 3 Rides",
+                            RequiredLevel = 1,
                             TargetValue = 3.0,
                             Type = 2,
                             XpReward = 125
@@ -195,6 +207,9 @@ namespace CadenceXP.Api.Migrations
 
                     b.Property<int>("QuestId")
                         .HasColumnType("integer");
+
+                    b.Property<DateTime>("UnlockedAtUtc")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");

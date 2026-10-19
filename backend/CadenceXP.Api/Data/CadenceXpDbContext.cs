@@ -36,6 +36,8 @@ public class CadenceXpDbContext : DbContext
                 Name = "Ride 5 Miles",
                 Description = "Ride a total of 5 miles.",
                 Type = QuestType.Distance,
+                RequiredLevel = 1,
+                Difficulty = QuestDifficulty.Standard,
                 TargetValue = 5,
                 XpReward = 75
             },
@@ -46,6 +48,8 @@ public class CadenceXpDbContext : DbContext
                 Name = "Climb 300 Meters",
                 Description = "Climb a total of 300 meters.",
                 Type = QuestType.Elevation,
+                RequiredLevel = 1,
+                Difficulty = QuestDifficulty.Standard,
                 TargetValue = 300,
                 XpReward = 100
             },
@@ -56,10 +60,11 @@ public class CadenceXpDbContext : DbContext
                 Name = "Complete 3 Rides",
                 Description = "Complete your first 3 rides.",
                 Type = QuestType.RideCount,
+                RequiredLevel = 1,
+                Difficulty = QuestDifficulty.Standard,
                 TargetValue = 3,
                 XpReward = 125
             }
         );
     }
-
 }

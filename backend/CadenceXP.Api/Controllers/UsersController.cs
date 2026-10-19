@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CadenceXP.Api.Services.Xp;
 using CadenceXP.Api.Models.Enums;
+using CadenceXP.Api.Services.Quests;
 
 namespace CadenceXP.Api.Controllers;
 
@@ -14,11 +15,16 @@ public class UsersController : ControllerBase
 {
     private readonly CadenceXpDbContext _database;
     private readonly XpService _xpService;
+    private readonly QuestUnlockService _questUnlockService;
 
-    public UsersController(CadenceXpDbContext database, XpService xpService)
+    public UsersController(
+        CadenceXpDbContext database,
+        XpService xpService,
+        QuestUnlockService questUnlockService)
     {
         _database = database;
         _xpService = xpService;
+        _questUnlockService = questUnlockService;
     }
 
     [HttpGet]
@@ -55,6 +61,7 @@ public class UsersController : ControllerBase
         _database.Users.Add(user);
 
         await _database.SaveChangesAsync();
+        await _questUnlockService.UnlockEligibleQuestsAsync(user.Id);
 
         return Created($"/api/users/{user.Id}", user);
     }

@@ -11,5 +11,7 @@ public class UserQuest
 
     public double Progress { get; set; }
     public bool IsCompleted { get; set; }
+
+    public DateTime UnlockedAtUtc { get; set; }
     public DateTime? CompletedAtUtc { get; set; }
 }

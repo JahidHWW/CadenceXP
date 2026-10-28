@@ -147,8 +147,14 @@ public class UsersController : ControllerBase
                 Name = quest.Name,
                 Description = quest.Description,
                 Type = quest.Type,
+                Difficulty = quest.Difficulty,
+                RequiredLevel = quest.RequiredLevel,
                 TargetValue = quest.TargetValue,
                 XpReward = quest.XpReward,
+                IsUnlocked = userQuest != null,
+                UnlockedAtUtc = userQuest != null
+                ? userQuest.UnlockedAtUtc
+                : null,
 
                 Progress = userQuest != null
                 ? userQuest.Progress

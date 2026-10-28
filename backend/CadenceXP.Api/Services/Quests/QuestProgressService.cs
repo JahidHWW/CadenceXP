@@ -39,6 +39,10 @@ public class QuestProgressService
                 .Sum(ride => ride.ElevationGainMeters);
             int rideCount = ridesSinceUnlock.Count;
             double distanceMiles = distanceMeters / 1609.344;
+            double longestRideMiles = ridesSinceUnlock
+                .Select(ride => ride.DistanceMeters / 1609.344)
+                .DefaultIfEmpty(0)
+                .Max();
             double progressValue;
             switch (quest.Type)
             {
@@ -52,6 +56,10 @@ public class QuestProgressService
 
                 case QuestType.RideCount:
                     progressValue = rideCount;
+                    break;
+
+                case QuestType.SingleRideDistance:
+                    progressValue = longestRideMiles;
                     break;
 
                 default:

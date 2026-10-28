@@ -114,7 +114,7 @@ namespace CadenceXP.Api.Migrations
                             RequiredLevel = 1,
                             TargetValue = 5.0,
                             Type = 0,
-                            XpReward = 75
+                            XpReward = 50
                         },
                         new
                         {
@@ -125,7 +125,7 @@ namespace CadenceXP.Api.Migrations
                             RequiredLevel = 1,
                             TargetValue = 300.0,
                             Type = 1,
-                            XpReward = 100
+                            XpReward = 60
                         },
                         new
                         {
@@ -136,7 +136,524 @@ namespace CadenceXP.Api.Migrations
                             RequiredLevel = 1,
                             TargetValue = 3.0,
                             Type = 2,
+                            XpReward = 75
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "Complete a single ride of at least 3 miles.",
+                            Difficulty = 0,
+                            Name = "Ride 3 Miles in One Ride",
+                            RequiredLevel = 3,
+                            TargetValue = 3.0,
+                            Type = 3,
+                            XpReward = 75
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Description = "Ride a total of 15 miles after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Ride 15 Total Miles",
+                            RequiredLevel = 5,
+                            TargetValue = 15.0,
+                            Type = 0,
+                            XpReward = 100
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Description = "Climb a total of 500 meters after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Climb 500 Meters",
+                            RequiredLevel = 5,
+                            TargetValue = 500.0,
+                            Type = 1,
+                            XpReward = 100
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Description = "Complete 5 rides after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Complete 5 Rides",
+                            RequiredLevel = 7,
+                            TargetValue = 5.0,
+                            Type = 2,
+                            XpReward = 100
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Description = "Complete a single ride of at least 5 miles.",
+                            Difficulty = 0,
+                            Name = "Ride 5 Miles in One Ride",
+                            RequiredLevel = 7,
+                            TargetValue = 5.0,
+                            Type = 3,
                             XpReward = 125
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Description = "Climb a total of 750 meters after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Climb 750 Meters",
+                            RequiredLevel = 8,
+                            TargetValue = 750.0,
+                            Type = 1,
+                            XpReward = 125
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Description = "Ride a total of 30 miles after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Ride 30 Total Miles",
+                            RequiredLevel = 10,
+                            TargetValue = 30.0,
+                            Type = 0,
+                            XpReward = 150
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Description = "Complete 10 rides after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Complete 10 Rides",
+                            RequiredLevel = 10,
+                            TargetValue = 10.0,
+                            Type = 2,
+                            XpReward = 150
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Description = "Complete a single ride of at least 10 miles.",
+                            Difficulty = 1,
+                            Name = "Ride 10 Miles in One Ride",
+                            RequiredLevel = 10,
+                            TargetValue = 10.0,
+                            Type = 3,
+                            XpReward = 225
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Description = "Ride a total of 50 miles after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Ride 50 Total Miles",
+                            RequiredLevel = 12,
+                            TargetValue = 50.0,
+                            Type = 0,
+                            XpReward = 200
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Description = "Complete 12 rides after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Complete 12 Rides",
+                            RequiredLevel = 12,
+                            TargetValue = 12.0,
+                            Type = 2,
+                            XpReward = 175
+                        },
+                        new
+                        {
+                            Id = 15,
+                            Description = "Climb a total of 1,000 meters after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Climb 1,000 Meters",
+                            RequiredLevel = 13,
+                            TargetValue = 1000.0,
+                            Type = 1,
+                            XpReward = 200
+                        },
+                        new
+                        {
+                            Id = 16,
+                            Description = "Complete a single ride of at least 15 miles.",
+                            Difficulty = 1,
+                            Name = "Ride 15 Miles in One Ride",
+                            RequiredLevel = 15,
+                            TargetValue = 15.0,
+                            Type = 3,
+                            XpReward = 300
+                        },
+                        new
+                        {
+                            Id = 17,
+                            Description = "Complete 15 rides after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Complete 15 Rides",
+                            RequiredLevel = 15,
+                            TargetValue = 15.0,
+                            Type = 2,
+                            XpReward = 200
+                        },
+                        new
+                        {
+                            Id = 18,
+                            Description = "Ride a total of 75 miles after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Ride 75 Total Miles",
+                            RequiredLevel = 17,
+                            TargetValue = 75.0,
+                            Type = 0,
+                            XpReward = 250
+                        },
+                        new
+                        {
+                            Id = 19,
+                            Description = "Climb a total of 1,500 meters after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Climb 1,500 Meters",
+                            RequiredLevel = 18,
+                            TargetValue = 1500.0,
+                            Type = 1,
+                            XpReward = 250
+                        },
+                        new
+                        {
+                            Id = 20,
+                            Description = "Complete 20 rides after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Complete 20 Rides",
+                            RequiredLevel = 20,
+                            TargetValue = 20.0,
+                            Type = 2,
+                            XpReward = 250
+                        },
+                        new
+                        {
+                            Id = 21,
+                            Description = "Complete a single ride of at least 20 miles.",
+                            Difficulty = 1,
+                            Name = "Ride 20 Miles in One Ride",
+                            RequiredLevel = 20,
+                            TargetValue = 20.0,
+                            Type = 3,
+                            XpReward = 350
+                        },
+                        new
+                        {
+                            Id = 22,
+                            Description = "Ride a total of 100 miles after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Ride 100 Total Miles",
+                            RequiredLevel = 22,
+                            TargetValue = 100.0,
+                            Type = 0,
+                            XpReward = 300
+                        },
+                        new
+                        {
+                            Id = 23,
+                            Description = "Complete 25 rides after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Complete 25 Rides",
+                            RequiredLevel = 22,
+                            TargetValue = 25.0,
+                            Type = 2,
+                            XpReward = 250
+                        },
+                        new
+                        {
+                            Id = 24,
+                            Description = "Climb a total of 2,000 meters after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Climb 2,000 Meters",
+                            RequiredLevel = 23,
+                            TargetValue = 2000.0,
+                            Type = 1,
+                            XpReward = 300
+                        },
+                        new
+                        {
+                            Id = 25,
+                            Description = "Complete a single ride of at least 25 miles.",
+                            Difficulty = 1,
+                            Name = "Ride 25 Miles in One Ride",
+                            RequiredLevel = 25,
+                            TargetValue = 25.0,
+                            Type = 3,
+                            XpReward = 400
+                        },
+                        new
+                        {
+                            Id = 26,
+                            Description = "Complete 30 rides after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Complete 30 Rides",
+                            RequiredLevel = 25,
+                            TargetValue = 30.0,
+                            Type = 2,
+                            XpReward = 300
+                        },
+                        new
+                        {
+                            Id = 27,
+                            Description = "Ride a total of 150 miles after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Ride 150 Total Miles",
+                            RequiredLevel = 27,
+                            TargetValue = 150.0,
+                            Type = 0,
+                            XpReward = 350
+                        },
+                        new
+                        {
+                            Id = 28,
+                            Description = "Climb a total of 3,000 meters after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Climb 3,000 Meters",
+                            RequiredLevel = 28,
+                            TargetValue = 3000.0,
+                            Type = 1,
+                            XpReward = 350
+                        },
+                        new
+                        {
+                            Id = 29,
+                            Description = "Complete 40 rides after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Complete 40 Rides",
+                            RequiredLevel = 30,
+                            TargetValue = 40.0,
+                            Type = 2,
+                            XpReward = 350
+                        },
+                        new
+                        {
+                            Id = 30,
+                            Description = "Complete a single ride of at least 30 miles.",
+                            Difficulty = 1,
+                            Name = "Ride 30 Miles in One Ride",
+                            RequiredLevel = 30,
+                            TargetValue = 30.0,
+                            Type = 3,
+                            XpReward = 450
+                        },
+                        new
+                        {
+                            Id = 31,
+                            Description = "Ride a total of 200 miles after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Ride 200 Total Miles",
+                            RequiredLevel = 32,
+                            TargetValue = 200.0,
+                            Type = 0,
+                            XpReward = 400
+                        },
+                        new
+                        {
+                            Id = 32,
+                            Description = "Complete 50 rides after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Complete 50 Rides",
+                            RequiredLevel = 32,
+                            TargetValue = 50.0,
+                            Type = 2,
+                            XpReward = 400
+                        },
+                        new
+                        {
+                            Id = 33,
+                            Description = "Climb a total of 4,000 meters after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Climb 4,000 Meters",
+                            RequiredLevel = 33,
+                            TargetValue = 4000.0,
+                            Type = 1,
+                            XpReward = 400
+                        },
+                        new
+                        {
+                            Id = 34,
+                            Description = "Complete a single ride of at least 35 miles.",
+                            Difficulty = 1,
+                            Name = "Ride 35 Miles in One Ride",
+                            RequiredLevel = 35,
+                            TargetValue = 35.0,
+                            Type = 3,
+                            XpReward = 500
+                        },
+                        new
+                        {
+                            Id = 35,
+                            Description = "Complete 60 rides after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Complete 60 Rides",
+                            RequiredLevel = 35,
+                            TargetValue = 60.0,
+                            Type = 2,
+                            XpReward = 400
+                        },
+                        new
+                        {
+                            Id = 36,
+                            Description = "Ride a total of 250 miles after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Ride 250 Total Miles",
+                            RequiredLevel = 37,
+                            TargetValue = 250.0,
+                            Type = 0,
+                            XpReward = 450
+                        },
+                        new
+                        {
+                            Id = 37,
+                            Description = "Climb a total of 5,000 meters after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Climb 5,000 Meters",
+                            RequiredLevel = 38,
+                            TargetValue = 5000.0,
+                            Type = 1,
+                            XpReward = 450
+                        },
+                        new
+                        {
+                            Id = 38,
+                            Description = "Complete 75 rides after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Complete 75 Rides",
+                            RequiredLevel = 40,
+                            TargetValue = 75.0,
+                            Type = 2,
+                            XpReward = 450
+                        },
+                        new
+                        {
+                            Id = 39,
+                            Description = "Complete a single ride of at least 40 miles.",
+                            Difficulty = 1,
+                            Name = "Ride 40 Miles in One Ride",
+                            RequiredLevel = 40,
+                            TargetValue = 40.0,
+                            Type = 3,
+                            XpReward = 600
+                        },
+                        new
+                        {
+                            Id = 40,
+                            Description = "Complete a single ride of at least 50 miles.",
+                            Difficulty = 2,
+                            Name = "The Fifty",
+                            RequiredLevel = 40,
+                            TargetValue = 50.0,
+                            Type = 3,
+                            XpReward = 900
+                        },
+                        new
+                        {
+                            Id = 41,
+                            Description = "Ride a total of 300 miles after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Ride 300 Total Miles",
+                            RequiredLevel = 42,
+                            TargetValue = 300.0,
+                            Type = 0,
+                            XpReward = 500
+                        },
+                        new
+                        {
+                            Id = 42,
+                            Description = "Complete 90 rides after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Complete 90 Rides",
+                            RequiredLevel = 42,
+                            TargetValue = 90.0,
+                            Type = 2,
+                            XpReward = 500
+                        },
+                        new
+                        {
+                            Id = 43,
+                            Description = "Climb a total of 6,500 meters after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Climb 6,500 Meters",
+                            RequiredLevel = 43,
+                            TargetValue = 6500.0,
+                            Type = 1,
+                            XpReward = 500
+                        },
+                        new
+                        {
+                            Id = 44,
+                            Description = "Complete a single ride of at least 45 miles.",
+                            Difficulty = 1,
+                            Name = "Ride 45 Miles in One Ride",
+                            RequiredLevel = 45,
+                            TargetValue = 45.0,
+                            Type = 3,
+                            XpReward = 650
+                        },
+                        new
+                        {
+                            Id = 45,
+                            Description = "Complete 100 rides after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Complete 100 Rides",
+                            RequiredLevel = 45,
+                            TargetValue = 100.0,
+                            Type = 2,
+                            XpReward = 550
+                        },
+                        new
+                        {
+                            Id = 46,
+                            Description = "Ride a total of 400 miles after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Ride 400 Total Miles",
+                            RequiredLevel = 47,
+                            TargetValue = 400.0,
+                            Type = 0,
+                            XpReward = 600
+                        },
+                        new
+                        {
+                            Id = 47,
+                            Description = "Climb a total of 8,000 meters after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Climb 8,000 Meters",
+                            RequiredLevel = 48,
+                            TargetValue = 8000.0,
+                            Type = 1,
+                            XpReward = 600
+                        },
+                        new
+                        {
+                            Id = 48,
+                            Description = "Complete a single ride of at least 100 miles.",
+                            Difficulty = 2,
+                            Name = "Century Ride",
+                            RequiredLevel = 48,
+                            TargetValue = 100.0,
+                            Type = 3,
+                            XpReward = 1500
+                        },
+                        new
+                        {
+                            Id = 49,
+                            Description = "Complete 125 rides after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Complete 125 Rides",
+                            RequiredLevel = 50,
+                            TargetValue = 125.0,
+                            Type = 2,
+                            XpReward = 650
+                        },
+                        new
+                        {
+                            Id = 50,
+                            Description = "Ride a total of 500 miles after unlocking this quest.",
+                            Difficulty = 0,
+                            Name = "Ride 500 Total Miles",
+                            RequiredLevel = 50,
+                            TargetValue = 500.0,
+                            Type = 0,
+                            XpReward = 700
                         });
                 });
 

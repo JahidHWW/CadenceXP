@@ -4,5 +4,6 @@ public enum QuestType
 {
     Distance,
     Elevation,
-    RideCount
+    RideCount,
+    SingleRideDistance
 }

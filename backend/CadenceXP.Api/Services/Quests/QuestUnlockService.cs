@@ -31,7 +31,13 @@ public class QuestUnlockService
             && userQuest.IsCompleted)
             .SumAsync(userQuest => userQuest.Quest.XpReward);
 
-        int totalXp = rideXp + questXp;
+        var achievementXp = await _database.UserAchievements
+            .Where(userAchievement =>
+                userAchievement.UserId == userId)
+            .SumAsync(userAchievement =>
+                userAchievement.Achievement.XpReward);
+
+        int totalXp = rideXp + questXp + achievementXp;
 
         int currentLevel = _xpService.CalculateLevel(totalXp);
 

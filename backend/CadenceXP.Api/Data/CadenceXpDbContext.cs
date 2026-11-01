@@ -16,6 +16,8 @@ public class CadenceXpDbContext : DbContext
     public DbSet<Ride> Rides { get; set; } = null!;
     public DbSet<Quest> Quests { get; set; } = null!;
     public DbSet<UserQuest> UserQuests { get; set; } = null!;
+    public DbSet<Achievement> Achievements { get; set; }
+    public DbSet<UserAchievement> UserAchievements { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -28,6 +30,128 @@ public class CadenceXpDbContext : DbContext
                 userQuest.QuestId
             })
             .IsUnique();
+
+        modelBuilder.Entity<UserAchievement>()
+            .HasIndex(userAchievement => new
+            {
+                userAchievement.UserId,
+                userAchievement.AchievementId
+            })
+            .IsUnique();
+
+        modelBuilder.Entity<Achievement>().HasData(
+            new Achievement
+            {
+                Id = 1,
+                Name = "First Ride",
+                Description = "Complete your first ride.",
+                Type = AchievementType.RideCount,
+                TargetValue = 1,
+                XpReward = 25
+            },
+            new Achievement
+            {
+                Id = 2,
+                Name = "Regular Rider",
+                Description = "Complete 10 rides.",
+                Type = AchievementType.RideCount,
+                TargetValue = 10,
+                XpReward = 75
+            },
+            new Achievement
+            {
+                Id = 3,
+                Name = "Dedicated Rider",
+                Description = "Complete 50 rides.",
+                Type = AchievementType.RideCount,
+                TargetValue = 50,
+                XpReward = 200
+            },
+
+            new Achievement
+            {
+                Id = 4,
+                Name = "10 Mile Club",
+                Description = "Ride a total of 10 miles.",
+                Type = AchievementType.TotalDistance,
+                TargetValue = 10,
+                XpReward = 50
+            },
+            new Achievement
+            {
+                Id = 5,
+                Name = "Century of Miles",
+                Description = "Ride a total of 100 miles.",
+                Type = AchievementType.TotalDistance,
+                TargetValue = 100,
+                XpReward = 150
+            },
+            new Achievement
+            {
+                Id = 6,
+                Name = "500 Mile Rider",
+                Description = "Ride a total of 500 miles.",
+                Type = AchievementType.TotalDistance,
+                TargetValue = 500,
+                XpReward = 300
+            },
+
+            new Achievement
+            {
+                Id = 7,
+                Name = "Climber",
+                Description = "Climb a total of 1,000 meters.",
+                Type = AchievementType.TotalElevation,
+                TargetValue = 1000,
+                XpReward = 75
+            },
+            new Achievement
+            {
+                Id = 8,
+                Name = "Mountain Legs",
+                Description = "Climb a total of 5,000 meters.",
+                Type = AchievementType.TotalElevation,
+                TargetValue = 5000,
+                XpReward = 175
+            },
+            new Achievement
+            {
+                Id = 9,
+                Name = "High Altitude",
+                Description = "Climb a total of 10,000 meters.",
+                Type = AchievementType.TotalElevation,
+                TargetValue = 10000,
+                XpReward = 300
+            },
+
+            new Achievement
+            {
+                Id = 10,
+                Name = "Double Digits",
+                Description = "Complete a single ride of at least 10 miles.",
+                Type = AchievementType.SingleRideDistance,
+                TargetValue = 10,
+                XpReward = 75
+            },
+            new Achievement
+            {
+                Id = 11,
+                Name = "Quarter Century",
+                Description = "Complete a single ride of at least 25 miles.",
+                Type = AchievementType.SingleRideDistance,
+                TargetValue = 25,
+                XpReward = 150
+            },
+            new Achievement
+            {
+                Id = 12,
+                Name = "Half Century",
+                Description = "Complete a single ride of at least 50 miles.",
+                Type = AchievementType.SingleRideDistance,
+                TargetValue = 50,
+                XpReward = 300
+            }
+        );
 
         modelBuilder.Entity<Quest>().HasData(
             new Quest

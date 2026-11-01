@@ -22,6 +22,146 @@ namespace CadenceXP.Api.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("CadenceXP.Api.Models.Achievement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<double>("TargetValue")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("XpReward")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Achievements");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Complete your first ride.",
+                            Name = "First Ride",
+                            TargetValue = 1.0,
+                            Type = 2,
+                            XpReward = 25
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Complete 10 rides.",
+                            Name = "Regular Rider",
+                            TargetValue = 10.0,
+                            Type = 2,
+                            XpReward = 75
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Complete 50 rides.",
+                            Name = "Dedicated Rider",
+                            TargetValue = 50.0,
+                            Type = 2,
+                            XpReward = 200
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "Ride a total of 10 miles.",
+                            Name = "10 Mile Club",
+                            TargetValue = 10.0,
+                            Type = 0,
+                            XpReward = 50
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Description = "Ride a total of 100 miles.",
+                            Name = "Century of Miles",
+                            TargetValue = 100.0,
+                            Type = 0,
+                            XpReward = 150
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Description = "Ride a total of 500 miles.",
+                            Name = "500 Mile Rider",
+                            TargetValue = 500.0,
+                            Type = 0,
+                            XpReward = 300
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Description = "Climb a total of 1,000 meters.",
+                            Name = "Climber",
+                            TargetValue = 1000.0,
+                            Type = 1,
+                            XpReward = 75
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Description = "Climb a total of 5,000 meters.",
+                            Name = "Mountain Legs",
+                            TargetValue = 5000.0,
+                            Type = 1,
+                            XpReward = 175
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Description = "Climb a total of 10,000 meters.",
+                            Name = "High Altitude",
+                            TargetValue = 10000.0,
+                            Type = 1,
+                            XpReward = 300
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Description = "Complete a single ride of at least 10 miles.",
+                            Name = "Double Digits",
+                            TargetValue = 10.0,
+                            Type = 3,
+                            XpReward = 75
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Description = "Complete a single ride of at least 25 miles.",
+                            Name = "Quarter Century",
+                            TargetValue = 25.0,
+                            Type = 3,
+                            XpReward = 150
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Description = "Complete a single ride of at least 50 miles.",
+                            Name = "Half Century",
+                            TargetValue = 50.0,
+                            Type = 3,
+                            XpReward = 300
+                        });
+                });
+
             modelBuilder.Entity("CadenceXP.Api.Models.AppUser", b =>
                 {
                     b.Property<int>("Id")
@@ -705,6 +845,33 @@ namespace CadenceXP.Api.Migrations
                     b.ToTable("Rides");
                 });
 
+            modelBuilder.Entity("CadenceXP.Api.Models.UserAchievement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AchievementId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("EarnedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AchievementId");
+
+                    b.HasIndex("UserId", "AchievementId")
+                        .IsUnique();
+
+                    b.ToTable("UserAchievements");
+                });
+
             modelBuilder.Entity("CadenceXP.Api.Models.UserQuest", b =>
                 {
                     b.Property<int>("Id")
@@ -771,6 +938,25 @@ namespace CadenceXP.Api.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("CadenceXP.Api.Models.UserAchievement", b =>
+                {
+                    b.HasOne("CadenceXP.Api.Models.Achievement", "Achievement")
+                        .WithMany()
+                        .HasForeignKey("AchievementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CadenceXP.Api.Models.AppUser", "User")
+                        .WithMany("Achievements")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Achievement");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("CadenceXP.Api.Models.UserQuest", b =>
                 {
                     b.HasOne("CadenceXP.Api.Models.Quest", "Quest")
@@ -792,6 +978,8 @@ namespace CadenceXP.Api.Migrations
 
             modelBuilder.Entity("CadenceXP.Api.Models.AppUser", b =>
                 {
+                    b.Navigation("Achievements");
+
                     b.Navigation("Bikes");
 
                     b.Navigation("Rides");

@@ -72,9 +72,16 @@ export default async function Home() {
           <div className="flex justify-center">
             <Link
               href="/quests"
-              className="rounded-lg bg-lime-400 px-5 py-3 font-semibold text-black transition hover:bg-lime-300"
+              className="rounded-lg border border-zinc-700 px-5 py-3 font-semibold text-white transition hover:bg-zinc-800"
             >
               Quests
+            </Link>
+
+            <Link
+              href="/achievements"
+              className="rounded-lg border border-zinc-700 px-5 py-3 font-semibold text-white transition hover:bg-zinc-800"
+            >
+              Achievements
             </Link>
           </div>
         </div>

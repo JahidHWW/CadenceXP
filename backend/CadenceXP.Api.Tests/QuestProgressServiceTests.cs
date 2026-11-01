@@ -4,6 +4,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using CadenceXP.Api.Models;
 using CadenceXP.Api.Models.Enums;
+using CadenceXP.Api.Services.Xp;
 
 public class QuestProgressServiceTests
 {
@@ -19,7 +20,7 @@ public class QuestProgressServiceTests
 
         int questCount = database.Quests.Count();
 
-        Assert.Equal(3, questCount);
+        Assert.Equal(50, questCount);
     }
 
     [Fact]
@@ -426,5 +427,153 @@ public class QuestProgressServiceTests
         await database.SaveChangesAsync();
 
         return userQuest;
+    }
+
+    [Fact]
+    public async Task UpdateUserQuestProgressAsync_WithSingleRideDistance_UsesLongestRide()
+    {
+        using var connection =
+            new SqliteConnection("DataSource=:memory:");
+
+        connection.Open();
+
+        using var database = CreateTestDatabase(connection);
+
+        var (user, bike) =
+            await CreateTestUserAndBikeAsync(database);
+
+        var quest = new Quest
+        {
+            Id = 100,
+            Name = "Ride 10 Miles",
+            Description = "Complete a single 10 mile ride.",
+            Type = QuestType.SingleRideDistance,
+            RequiredLevel = 1,
+            Difficulty = QuestDifficulty.Standard,
+            TargetValue = 10,
+            XpReward = 150
+        };
+
+        database.Quests.Add(quest);
+        await database.SaveChangesAsync();
+
+        await CreateUnlockedQuestAsync(
+            database,
+            user,
+            quest.Id
+        );
+
+        await CreateTestRideAsync(
+            database,
+            user,
+            bike,
+            1609.344 * 6,
+            0,
+            RideProcessingStatus.Completed
+        );
+
+        await CreateTestRideAsync(
+            database,
+            user,
+            bike,
+            1609.344 * 6,
+            0,
+            RideProcessingStatus.Completed
+        );
+
+        var service = new QuestProgressService(database);
+
+        await service.UpdateUserQuestProgressAsync(user.Id);
+
+        var userQuest = await database.UserQuests
+            .SingleAsync(userQuest =>
+                userQuest.UserId == user.Id &&
+                userQuest.QuestId == quest.Id);
+
+        Assert.Equal(6.0, userQuest.Progress, 6);
+        Assert.False(userQuest.IsCompleted);
+        Assert.Null(userQuest.CompletedAtUtc);
+    }
+
+    [Fact]
+    public async Task UnlockEligibleQuestsAsync_WhenUserReachesLevelThree_UnlocksQuestWithoutRetroactiveProgress()
+    {
+        using var connection =
+            new SqliteConnection("DataSource=:memory:");
+
+        connection.Open();
+
+        using var database = CreateTestDatabase(connection);
+
+        var (user, bike) =
+            await CreateTestUserAndBikeAsync(database);
+
+        var xpService = new XpService();
+
+        var unlockService =
+            new QuestUnlockService(database, xpService);
+
+        var progressService =
+            new QuestProgressService(database);
+
+        // New users begin at Level 1, so quests 1-3 should unlock.
+        await unlockService.UnlockEligibleQuestsAsync(user.Id);
+
+        var ride = await CreateTestRideAsync(
+            database,
+            user,
+            bike,
+            0,
+            0,
+            RideProcessingStatus.Completed
+        );
+
+        // 250 total XP is exactly enough to reach Level 3.
+        ride.XpEarned = 250;
+
+        await database.SaveChangesAsync();
+
+        // Production order:
+        // update currently unlocked quests first...
+        await progressService.UpdateUserQuestProgressAsync(user.Id);
+
+        // ...then recalculate level and unlock new quests.
+        await unlockService.UnlockEligibleQuestsAsync(user.Id);
+
+        var levelThreeQuest = await database.UserQuests
+            .Include(userQuest => userQuest.Quest)
+            .SingleAsync(userQuest =>
+                userQuest.UserId == user.Id &&
+                userQuest.QuestId == 4);
+
+        Assert.True(levelThreeQuest.UnlockedAtUtc >= ride.RideDateUtc);
+        Assert.Equal(0.0, levelThreeQuest.Progress, 6);
+        Assert.False(levelThreeQuest.IsCompleted);
+        Assert.Null(levelThreeQuest.CompletedAtUtc);
+
+        // Even if progress is recalculated again,
+        // the ride from before the quest unlocked must not count.
+        await progressService.UpdateUserQuestProgressAsync(user.Id);
+
+        var levelThreeQuestAfterUpdate =
+            await database.UserQuests
+                .SingleAsync(userQuest =>
+                    userQuest.UserId == user.Id &&
+                    userQuest.QuestId == 4);
+
+        Assert.Equal(
+            0.0,
+            levelThreeQuestAfterUpdate.Progress,
+            6
+        );
+
+        // Level 5 quests must still be locked.
+        bool levelFiveQuestsUnlocked =
+            await database.UserQuests.AnyAsync(userQuest =>
+                userQuest.UserId == user.Id &&
+                (userQuest.QuestId == 5 ||
+                 userQuest.QuestId == 6));
+
+        Assert.False(levelFiveQuestsUnlocked);
     }
 }

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CadenceXP.Api.Services.Xp;
 using CadenceXP.Api.Services.Quests;
+using CadenceXP.Api.Services.Achievements;
 
 namespace CadenceXP.Api.Controllers;
 
@@ -22,6 +23,7 @@ public class RidesController : ControllerBase
     private readonly XpService _xpService;
     private readonly QuestProgressService _questProgressService;
     private readonly QuestUnlockService _questUnlockService;
+    private readonly AchievementService _achievementService;
 
     public RidesController(
         CadenceXpDbContext database,
@@ -30,7 +32,8 @@ public class RidesController : ControllerBase
         RideProcessingService rideProcessingService,
         XpService xpService,
         QuestProgressService questProgressService,
-        QuestUnlockService questUnlockService)
+        QuestUnlockService questUnlockService,
+        AchievementService achievementService)
     {
         _database = database;
         _environment = environment;
@@ -39,6 +42,7 @@ public class RidesController : ControllerBase
         _xpService = xpService;
         _questProgressService = questProgressService;
         _questUnlockService = questUnlockService;
+        _achievementService = achievementService;
     }
 
     [HttpGet]
@@ -213,7 +217,9 @@ public class RidesController : ControllerBase
             await _database.SaveChangesAsync();
             await _questProgressService.UpdateUserQuestProgressAsync(ride.UserId);
             await _questUnlockService.UnlockEligibleQuestsAsync(ride.UserId);
+            await _achievementService.UpdateUserAchievementsAsync(ride.UserId);
         }
+
         catch (InvalidOperationException)
         {
             ride.ProcessingStatus =
@@ -351,6 +357,7 @@ public class RidesController : ControllerBase
             await _database.SaveChangesAsync();
             await _questProgressService.UpdateUserQuestProgressAsync(ride.UserId);
             await _questUnlockService.UnlockEligibleQuestsAsync(ride.UserId);
+            await _achievementService.UpdateUserAchievementsAsync(ride.UserId);
 
             var response = new RideResponse
             {

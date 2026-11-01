@@ -3,6 +3,9 @@ import type { TrackPoint } from "@/types/trackPoint";
 import type { Bike, CreateBikeRequest } from "@/types/bike";
 import type { UserProgress } from "@/types/userProgress";
 import type { UserQuest } from "@/types/userQuest";
+import type { UserAchievement } from "@/types/userAchievement";
+export type { UserQuest };
+export type { UserAchievement };
 
 export async function getRides(): Promise<Ride[]> {
     const response = await fetch(
@@ -152,4 +155,21 @@ export async function getUserQuests(
         await response.json();
 
     return quests;
+}
+
+export async function getUserAchievements(
+    userId: number
+): Promise<UserAchievement[]> {
+    const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/${userId}/achievements`,
+        {
+            cache: "no-store"
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Failed to fetch achievements");
+    }
+
+    return response.json();
 }

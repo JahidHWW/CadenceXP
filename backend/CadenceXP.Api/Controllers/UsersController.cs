@@ -100,7 +100,13 @@ public class UsersController : ControllerBase
                 userQuest.IsCompleted)
             .SumAsync(userQuest => userQuest.Quest.XpReward);
 
-        int totalXp = rideXp + questXp;
+        var achievementXp = await _database.UserAchievements
+            .Where(userAchievement =>
+                userAchievement.UserId == id)
+            .SumAsync(userAchievement =>
+                userAchievement.Achievement.XpReward);
+
+        int totalXp = rideXp + questXp + achievementXp;
 
         var level = _xpService.CalculateLevel(totalXp);
         var xpIntoLevel =
@@ -171,5 +177,79 @@ public class UsersController : ControllerBase
         )
         .ToListAsync();
         return Ok(quests);
+    }
+
+    [HttpGet("{id}/achievements")]
+    public async Task<ActionResult<List<UserAchievementResponse>>> GetUserAchievements(
+    int id)
+    {
+        var userExists = await _database.Users
+            .AnyAsync(user => user.Id == id);
+
+        if (!userExists)
+        {
+            return NotFound();
+        }
+
+        var completedRides = await _database.Rides
+            .Where(ride =>
+                ride.UserId == id &&
+                ride.ProcessingStatus == RideProcessingStatus.Completed)
+            .ToListAsync();
+
+        double totalDistanceMiles =
+            completedRides.Sum(ride => ride.DistanceMeters) / 1609.344;
+
+        double totalElevationMeters =
+            completedRides.Sum(ride => ride.ElevationGainMeters);
+
+        int rideCount = completedRides.Count;
+
+        double longestRideMiles = completedRides
+            .Select(ride => ride.DistanceMeters / 1609.344)
+            .DefaultIfEmpty(0)
+            .Max();
+
+        var achievements = await _database.Achievements
+            .OrderBy(achievement => achievement.Id)
+            .ToListAsync();
+
+        var earnedAchievements = await _database.UserAchievements
+            .Where(userAchievement => userAchievement.UserId == id)
+            .ToDictionaryAsync(
+                userAchievement => userAchievement.AchievementId
+            );
+
+        var response = achievements.Select(achievement =>
+        {
+            double progress = achievement.Type switch
+            {
+                AchievementType.TotalDistance => totalDistanceMiles,
+                AchievementType.TotalElevation => totalElevationMeters,
+                AchievementType.RideCount => rideCount,
+                AchievementType.SingleRideDistance => longestRideMiles,
+                _ => 0
+            };
+
+            earnedAchievements.TryGetValue(
+                achievement.Id,
+                out var userAchievement
+            );
+
+            return new UserAchievementResponse
+            {
+                AchievementId = achievement.Id,
+                Name = achievement.Name,
+                Description = achievement.Description,
+                Type = achievement.Type,
+                TargetValue = achievement.TargetValue,
+                XpReward = achievement.XpReward,
+                IsEarned = userAchievement != null,
+                EarnedAtUtc = userAchievement?.EarnedAtUtc,
+                Progress = Math.Min(progress, achievement.TargetValue)
+            };
+        }).ToList();
+
+        return Ok(response);
     }
 }

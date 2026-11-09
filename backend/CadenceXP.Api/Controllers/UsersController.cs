@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using CadenceXP.Api.Services.Xp;
 using CadenceXP.Api.Models.Enums;
 using CadenceXP.Api.Services.Quests;
+using CadenceXP.Api.Services.Streaks;
 
 namespace CadenceXP.Api.Controllers;
 
@@ -16,15 +17,18 @@ public class UsersController : ControllerBase
     private readonly CadenceXpDbContext _database;
     private readonly XpService _xpService;
     private readonly QuestUnlockService _questUnlockService;
+    private readonly StreakService _streakService;
 
     public UsersController(
         CadenceXpDbContext database,
         XpService xpService,
-        QuestUnlockService questUnlockService)
+        QuestUnlockService questUnlockService,
+        StreakService streakService)
     {
         _database = database;
         _xpService = xpService;
         _questUnlockService = questUnlockService;
+        _streakService = streakService;
     }
 
     [HttpGet]
@@ -251,5 +255,21 @@ public class UsersController : ControllerBase
         }).ToList();
 
         return Ok(response);
+    }
+
+    [HttpGet("{id}/streak")]
+    public async Task<ActionResult<UserStreakResponse>> GetUserStreak(int id)
+    {
+        var userExists = await _database.Users
+            .AnyAsync(user => user.Id == id);
+
+        if (!userExists)
+        {
+            return NotFound();
+        }
+
+        var streak = await _streakService.GetUserStreakAsync(id);
+
+        return Ok(streak);
     }
 }

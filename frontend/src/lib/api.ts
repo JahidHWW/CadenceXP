@@ -6,6 +6,7 @@ import type { UserQuest } from "@/types/userQuest";
 import type { UserAchievement } from "@/types/userAchievement";
 export type { UserQuest };
 export type { UserAchievement };
+import type { UserStreak } from "@/types/userStreak";
 
 export async function getRides(): Promise<Ride[]> {
     const response = await fetch(
@@ -169,6 +170,23 @@ export async function getUserAchievements(
 
     if (!response.ok) {
         throw new Error("Failed to fetch achievements");
+    }
+
+    return response.json();
+}
+
+export async function getUserStreak(
+    userId: number
+): Promise<UserStreak> {
+    const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/${userId}/streak`,
+        {
+            cache: "no-store"
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Failed to fetch streak");
     }
 
     return response.json();

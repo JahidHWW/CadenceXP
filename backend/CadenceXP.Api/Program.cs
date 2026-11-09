@@ -6,6 +6,7 @@ using CadenceXP.Api.Services.Rides;
 using CadenceXP.Api.Services.Xp;
 using CadenceXP.Api.Services.Quests;
 using CadenceXP.Api.Services.Achievements;
+using CadenceXP.Api.Services.Streaks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,7 @@ builder.Services.AddScoped<XpService>();
 builder.Services.AddScoped<QuestProgressService>();
 builder.Services.AddScoped<QuestUnlockService>();
 builder.Services.AddScoped<AchievementService>();
+builder.Services.AddScoped<StreakService>();
 
 builder.Services.AddCors(options =>
 {
